@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-i18n="header.title">Women in Politics — Wikipedia</title>
+  <link rel="stylesheet" href="style.css?v=13" />
+
+  <!-- D3 + TopoJSON -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+
+  <!-- Chart.js + date adapter -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════ HEADER -->
+<header id="site-header">
+  <div id="header-top">
+    <div id="header-titles">
+      <h1 data-i18n-html="header.titleHtml">Women in Politics — Wikipedia</h1>
+    </div>
+    <div id="header-controls">
+      <button id="btn-lang" class="ctrl-btn" title="Switch language / Zmień język">
+        <span id="lang-label">PL</span>
+      </button>
+      <button id="btn-dark" class="ctrl-btn" title="Toggle dark mode" aria-label="Toggle dark mode">
+        <svg id="icon-dark" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg id="icon-light" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats bar -->
+  <div id="stats-bar">
+    <div class="stat-item">
+      <span class="stat-value" id="stat-articles">–</span>
+      <span class="stat-label" data-i18n="stats.articles">Articles</span>
+    </div>
+    <div class="stat-divider"></div>
+    <button class="stat-item stat-item--btn" id="stat-countries-btn">
+      <span class="stat-value" id="stat-countries">–</span>
+      <span class="stat-label" data-i18n="stats.countries">Countries</span>
+    </button>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-value" id="stat-coverage">–</span>
+      <span class="stat-label" data-i18n="stats.coverage">UN coverage</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-value stat-cw" id="stat-cw">–</span>
+      <span class="stat-label" data-i18n="stats.cw">Did You Know</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-value stat-da" id="stat-da">–</span>
+      <span class="stat-label" data-i18n="stats.da">Good Article</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-value stat-anm" id="stat-anm">–</span>
+      <span class="stat-label" data-i18n="stats.anm">Featured</span>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════ MAIN LAYOUT -->
+<main id="main-layout">
+
+  <!-- ── Left: map + controls ── -->
+  <div id="map-column">
+
+    <!-- Map controls row -->
+    <div id="map-controls">
+      <div id="color-mode-toggle" role="group" aria-label="Color mode">
+        <button class="mode-btn active" id="btn-mode-articles" data-mode="articles" data-i18n="map.colorByArticles">By articles</button>
+        <button class="mode-btn" id="btn-mode-awards" data-mode="awards" data-i18n="map.colorByAwards">By awards</button>
+      </div>
+      <div id="map-legend" aria-hidden="true">
+        <span class="legend-label" data-i18n="legend.none">0</span>
+        <div id="legend-gradient"></div>
+        <span class="legend-label" id="legend-max">–</span>
+      </div>
+    </div>
+
+    <!-- Continent filter bar -->
+    <div id="continent-bar">
+      <button class="continent-btn" data-continent="europe">🌍 <span data-i18n="continents.europe">Europe</span></button>
+      <button class="continent-btn" data-continent="africa">🌍 <span data-i18n="continents.africa">Africa</span></button>
+      <button class="continent-btn" data-continent="north_america">🌎 <span data-i18n="continents.north_america">North America</span></button>
+      <button class="continent-btn" data-continent="south_america">🌎 <span data-i18n="continents.south_america">South America</span></button>
+      <button class="continent-btn" data-continent="asia">🌏 <span data-i18n="continents.asia">Asia</span></button>
+      <button class="continent-btn" data-continent="oceania">🌏 <span data-i18n="continents.oceania">Oceania</span></button>
+      <button class="continent-btn" data-continent="antarctica">🧊 <span data-i18n="continents.antarctica">Antarctica</span></button>
+    </div>
+
+    <!-- World map (D3 SVG rendered here) -->
+    <div id="map-container">
+      <svg id="map-svg" viewBox="0 0 960 500" preserveAspectRatio="xMidYMid meet" aria-label="World map">
+        <g id="map-countries"></g>
+        <g id="map-borders"></g>
+      </svg>
+      <div id="map-loading">
+        <div class="spinner"></div>
+      </div>
+    </div>
+
+    <!-- Additional territories note (shown below map) -->
+    <div id="additional-note" hidden>
+      <span data-i18n="map.additionalNote">Some territories are not shown on the map.</span>
+      <button id="btn-show-additional" data-i18n="map.showAll">Show all →</button>
+    </div>
+
+  </div><!-- /map-column -->
+
+  <!-- ── Right: side panel ── -->
+  <aside id="side-panel" aria-live="polite">
+    <div id="panel-content" hidden>
+      <div id="panel-header">
+        <button id="panel-close" aria-label="Back">←</button>
+        <div id="panel-country-flag"></div>
+        <div id="panel-country-info">
+          <h2 id="panel-country-name"></h2>
+          <div id="panel-award-summary"></div>
+        </div>
+      </div>
+      <div id="panel-articles-list"></div>
+      <div id="panel-unrecognized-note" hidden>
+        <h3 data-i18n="panel.unrecognizedTitle">Related territories (not on map)</h3>
+        <div id="panel-unrecognized-list"></div>
+      </div>
+    </div>
+  </aside>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════ FILTERS + SEARCH -->
+<section id="filter-section">
+  <div id="filter-row">
+    <div id="filter-group-actions" class="filter-group">
+      <span class="filter-group-label" data-i18n="filters.editorialActions">Editorial actions</span>
+      <div id="filter-actions-buttons" class="filter-buttons"></div>
+    </div>
+    <div id="filter-group-awards" class="filter-group">
+      <span class="filter-group-label" data-i18n="filters.awardTypes">Awards</span>
+      <div id="filter-awards-buttons" class="filter-buttons">
+        <button class="filter-btn award-btn" data-award="cw">
+          <span class="badge-cw badge-sm" data-i18n="awards.cw">CW</span>
+        </button>
+        <button class="filter-btn award-btn" data-award="da">
+          <span class="badge-da badge-sm" data-i18n="awards.da">DA</span>
+        </button>
+        <button class="filter-btn award-btn" data-award="anm">
+          <span class="badge-anm badge-sm" data-i18n="awards.anm">ANM</span>
+        </button>
+        <button class="filter-btn" id="btn-no-awards">
+          <span data-i18n="filters.noAwards">No awards</span>
+          <span class="filter-count"></span>
+        </button>
+      </div>
+    </div>
+    <div id="filter-group-search" class="filter-group">
+      <span class="filter-group-label" data-i18n="filters.search">Search</span>
+      <input type="search" id="search-input" data-i18n-placeholder="search.placeholder" placeholder="Search articles…" autocomplete="off" />
+    </div>
+    <div id="filter-group-date" class="filter-group filter-group--date">
+      <span class="filter-group-label" data-i18n="filters.asOfDate">As of date</span>
+      <div class="filter-date-row">
+        <input type="date" id="filter-date-input" />
+        <button id="btn-clear-date" class="ctrl-btn" aria-label="Clear date">✕</button>
+      </div>
+    </div>
+    <button id="btn-clear-filters" class="ctrl-btn" data-i18n="filters.clearAll">Clear all</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ TIMELINE -->
+<section id="timeline-section">
+  <div id="timeline-header">
+    <h2 id="timeline-title" data-i18n="timeline.title">Awards over time</h2>
+    <div id="timeline-range">
+      <input type="date" id="timeline-from" aria-label="From date" />
+      <span class="timeline-range-sep">–</span>
+      <input type="date" id="timeline-to" aria-label="To date" />
+      <button id="timeline-reset" class="ctrl-btn" data-i18n="timeline.reset">Reset</button>
+    </div>
+  </div>
+  <div id="timeline-container">
+    <canvas id="timeline-chart"></canvas>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ CREATED TIMELINE -->
+<section id="created-section">
+  <div id="created-header">
+    <h2 id="created-title" data-i18n="created.title">Articles created over time</h2>
+    <div id="created-range">
+      <input type="date" id="created-from" aria-label="From date" />
+      <span class="timeline-range-sep">–</span>
+      <input type="date" id="created-to" aria-label="To date" />
+      <button id="created-reset" class="ctrl-btn" data-i18n="created.reset">Reset</button>
+    </div>
+  </div>
+  <div id="created-container">
+    <canvas id="created-chart"></canvas>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════ FOOTER -->
+<footer id="site-footer">
+  <a href="https://pl.wikipedia.org/wiki/Wikipedysta:Nadzik/Dookoła_świata" target="_blank" rel="noopener" data-i18n="footer.project">Projekt „Dookoła świata"</a>
+  &nbsp;·&nbsp;
+  <a href="https://pl.wikipedia.org/wiki/Wikiprojekt:Czy_wiesz/propozycje" target="_blank" rel="noopener" data-i18n="footer.cw">Czy wiesz — Wikipedia</a>
+  &nbsp;·&nbsp;
+  <a href="https://naadzik.github.io/" target="_blank" rel="noopener">naadzik.github.io</a>
+</footer>
+
+<!-- ══════════════════════════════════════════════════════════════ TOOLTIP -->
+<div id="tooltip" role="tooltip" aria-hidden="true"></div>
+
+<!-- ════════════════════════════════════════════════════════════ SCRIPTS -->
+<script type="module" src="js/app.js?v=13"></script>
+
+</body>
+</html>

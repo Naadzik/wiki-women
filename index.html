@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kobiety w polityce — Wikipedia</title>
+  <meta name="description" content="Interaktywna mapa biogramów kobiet w polityce na polskojęzycznej Wikipedii. Filtruj po kraju, wyróżnieniach i akcjach edycyjnych.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0d1117;
+      --surface: #161b22;
+      --border:  #21262d;
+      --text:    #e6edf3;
+      --muted:   #7d8590;
+      --dim:     #30363d;
+      --blue:    #4a90d9;
+      --blue-glow: rgba(74,144,217,.35);
+      --gold:    #f5c542;
+      --green:   #3fb950;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    /* ── Nav ── */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: .85rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .nav-back {
+      font-size: .8rem;
+      color: var(--muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: .3rem;
+      transition: color .15s;
+    }
+    .nav-back:hover { color: var(--text); }
+    .nav-sep { color: var(--dim); font-size: .8rem; }
+    .nav-title {
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    nav a.gh {
+      margin-left: auto;
+      display: flex; align-items: center; gap: .4rem;
+      font-size: .8rem; color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 6px; padding: .28rem .65rem;
+      transition: color .15s, border-color .15s;
+    }
+    nav a.gh:hover { color: var(--text); border-color: var(--muted); }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 4rem 2rem 3rem;
+      max-width: 760px;
+      margin: 0 auto;
+      width: 100%;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: rgba(74,144,217,.1);
+      border: 1px solid rgba(74,144,217,.25);
+      border-radius: 100px;
+      padding: .28rem .8rem;
+      font-size: .72rem; color: var(--blue); font-weight: 600;
+      letter-spacing: .04em; text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+    .badge::before {
+      content: '';
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--blue);
+      box-shadow: 0 0 6px var(--blue);
+      animation: blink 2.5s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .3; }
+    }
+
+    h1 {
+      font-size: clamp(1.9rem, 4.5vw, 2.9rem);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      line-height: 1.15;
+      margin-bottom: 1.1rem;
+    }
+    h1 em { font-style: normal; color: var(--blue); }
+
+    .lead {
+      font-size: clamp(.9rem, 2vw, 1.05rem);
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 560px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: .55rem;
+      background: var(--blue);
+      color: #fff; font-weight: 700; font-size: .98rem;
+      padding: .8rem 2rem; border-radius: 8px;
+      text-decoration: none;
+      box-shadow: 0 4px 22px var(--blue-glow);
+      transition: background .15s, transform .1s, box-shadow .15s;
+    }
+    .btn-primary:hover {
+      background: #5a9fe0;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 28px var(--blue-glow);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    /* ── Stats row ── */
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2.5rem;
+      margin: 3rem auto 0;
+      max-width: 600px;
+    }
+    .stat-item { text-align: center; }
+    .stat-value {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      color: var(--text);
+      display: block;
+    }
+    .stat-value.blue { color: var(--blue); }
+    .stat-value.gold { color: var(--gold); }
+    .stat-label {
+      font-size: .72rem;
+      color: var(--muted);
+      margin-top: .2rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    /* ── Features ── */
+    .features-section {
+      max-width: 960px;
+      margin: 4.5rem auto 0;
+      padding: 0 2rem;
+      width: 100%;
+    }
+    .section-label {
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 1.25rem;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 1px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .feature {
+      background: var(--surface);
+      padding: 1.35rem 1.5rem;
+    }
+    .feature-icon { font-size: 1.25rem; margin-bottom: .6rem; display: block; }
+    .feature h3 { font-size: .9rem; font-weight: 700; margin-bottom: .3rem; }
+    .feature p  { font-size: .8rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── Awards strip ── */
+    .awards-section {
+      max-width: 960px;
+      margin: 3rem auto 0;
+      padding: 0 2rem;
+      width: 100%;
+    }
+    .awards-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .45rem;
+      margin-top: .75rem;
+    }
+    .award-chip {
+      font-size: .78rem;
+      font-weight: 600;
+      border-radius: 6px;
+      padding: .3rem .7rem;
+    }
+    .award-chip.cw  { background: rgba(74,144,217,.12); color: #7db8ea; border: 1px solid rgba(74,144,217,.22); }
+    .award-chip.da  { background: rgba(245,197,66,.1);  color: #f5c542; border: 1px solid rgba(245,197,66,.22); }
+    .award-chip.anm { background: rgba(63,185,80,.1);   color: #3fb950; border: 1px solid rgba(63,185,80,.22); }
+    .award-chip .count {
+      opacity: .65;
+      font-weight: 400;
+      margin-left: .3rem;
+    }
+
+    /* ── Bottom CTA ── */
+    .bottom-cta {
+      text-align: center;
+      padding: 4.5rem 2rem;
+    }
+    .bottom-cta p {
+      font-size: .85rem;
+      color: var(--muted);
+      margin-top: .9rem;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1rem 2rem;
+      font-size: .76rem;
+      color: var(--dim);
+      text-align: center;
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-back" href="https://naadzik.github.io/">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <path d="M19 12H5M12 5l-7 7 7 7"/>
+    </svg>
+    naadzik.github.io
+  </a>
+  <span class="nav-sep">/</span>
+  <span class="nav-title">Kobiety w polityce — Wikipedia</span>
+  <a class="gh" href="https://github.com/Naadzik/wiki-women" target="_blank" rel="noopener">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.167 6.839 9.49.5.092.682-.217.682-.482
+               0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.34-3.369-1.34-.454-1.154-1.11-1.462-1.11-1.462
+               -.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831
+               .091-.646.35-1.087.636-1.337-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683
+               -.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1
+               2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028
+               1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012
+               2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+    </svg>
+    GitHub
+  </a>
+</nav>
+
+<main>
+
+  <section class="hero">
+    <span class="badge">Dane aktualne</span>
+    <h1>Kobiety w polityce<br>na polskiej <em>Wikipedii</em></h1>
+    <p class="lead">
+      Interaktywna mapa świata pokazująca biogramy kobiet w polityce
+      napisane przez Wikipedysta:Nadzik. Filtruj po kraju, wyróżnieniach,
+      akcjach edycyjnych i dacie — wszystko w jednym miejscu.
+    </p>
+    <a class="btn-primary" href="app.html">
+      Otwórz mapę
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </a>
+
+    <div class="stats">
+      <div class="stat-item">
+        <span class="stat-value blue">415</span>
+        <span class="stat-label">Artykułów</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">199</span>
+        <span class="stat-label">Państw</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value gold">231</span>
+        <span class="stat-label">Wyróżnień CW</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section">
+    <p class="section-label">Co zawiera narzędzie</p>
+    <div class="features">
+      <div class="feature">
+        <span class="feature-icon">🗺️</span>
+        <h3>Mapa choropleth</h3>
+        <p>Interaktywna mapa świata kolorowana wg liczby artykułów lub wyróżnień. Kliknij kraj, by zobaczyć pełną listę biogramów.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">🔍</span>
+        <h3>Filtry i wyszukiwanie</h3>
+        <p>Filtruj po wyróżnieniach (CW, DA, ANM), akcjach edycyjnych (CEE Spring, Tygodnie tematyczne…) i dowolnym tekście.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">📅</span>
+        <h3>Filtr czasowy</h3>
+        <p>Wybierz konkretną datę i sprawdź, jak wyglądał stan kolekcji w przeszłości — mapa i statystyki aktualizują się na bieżąco.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">📈</span>
+        <h3>Wykresy w czasie</h3>
+        <p>Dwa timelines: skumulowane wyróżnienia „Czy wiesz" oraz liczba tworzonych artykułów rok po roku.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">🌍</span>
+        <h3>Zoom kontynentalny</h3>
+        <p>Przyciski kontynentu filtrują mapę i panel państw jednocześnie, zachowując płynne przybliżenie.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">🌐</span>
+        <h3>Wersja EN / PL</h3>
+        <p>Pełne tłumaczenie interfejsu na język angielski — jedna strona, dwa języki.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="awards-section">
+    <p class="section-label">Typy wyróżnień</p>
+    <div class="awards-grid">
+      <span class="award-chip cw">✦ Czy wiesz <span class="count">231 artykułów</span></span>
+      <span class="award-chip da">★ Dobry artykuł <span class="count">2 artykuły</span></span>
+      <span class="award-chip anm">★★ Artykuł na medal <span class="count">1 artykuł</span></span>
+    </div>
+  </section>
+
+  <div class="bottom-cta">
+    <a class="btn-primary" href="app.html">
+      Otwórz mapę
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </a>
+    <p>Działa w przeglądarce &nbsp;·&nbsp; bez rejestracji &nbsp;·&nbsp; dane z Wikipedii</p>
+  </div>
+
+</main>
+
+<footer>
+  <a href="https://naadzik.github.io/">naadzik.github.io</a>
+  &nbsp;·&nbsp;
+  <a href="https://pl.wikipedia.org/wiki/Wikipedysta:Nadzik" target="_blank" rel="noopener">Wikipedysta:Nadzik</a>
+  &nbsp;·&nbsp;
+  <a href="https://meta.wikimedia.org/wiki/Grants:Project/Nadzik/Kobiety_w_polityce" target="_blank" rel="noopener">Projekt „Dookoła świata"</a>
+</footer>
+
+</body>
+</html>
