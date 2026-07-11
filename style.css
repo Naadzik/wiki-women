@@ -339,6 +339,31 @@ html.dark #legend-gradient {
 }
 
 /* ── Replay control + overlay ── */
+#replay-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#replay-speed {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.speed-btn {
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  color: var(--text-soft);
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.speed-btn:last-child { border-right: none; }
+.speed-btn:hover { background: var(--surface); color: var(--text); }
+.speed-btn.active { background: var(--accent); color: #fff; }
+
 .replay-btn {
   display: inline-flex;
   align-items: center;
@@ -1249,6 +1274,7 @@ body.present .stat-divider { height: 46px; }
 body.present .mode-btn,
 body.present .replay-btn,
 body.present .continent-btn { font-size: 1rem; padding: 7px 16px; }
+body.present .speed-btn { font-size: 0.95rem; padding: 7px 12px; }
 
 body.present #map-legend { font-size: 0.95rem; }
 body.present #legend-gradient { width: 170px; height: 14px; }
