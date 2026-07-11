@@ -105,11 +105,18 @@
         <button class="mode-btn active" id="btn-mode-articles" data-mode="articles" data-i18n="map.colorByArticles">By articles</button>
         <button class="mode-btn" id="btn-mode-awards" data-mode="awards" data-i18n="map.colorByAwards">By awards</button>
       </div>
-      <button id="btn-replay" class="replay-btn" data-i18n-title="replay.play" title="Replay the year">
-        <svg class="replay-icon-play" viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        <svg class="replay-icon-pause" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
-        <span data-i18n="replay.label">Replay the year</span>
-      </button>
+      <div id="replay-controls">
+        <button id="btn-replay" class="replay-btn" data-i18n-title="replay.play" title="Replay the year">
+          <svg class="replay-icon-play" viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <svg class="replay-icon-pause" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+          <span data-i18n="replay.label">Replay the year</span>
+        </button>
+        <div id="replay-speed" role="group" data-i18n-title="replay.speed" title="Animation speed" aria-label="Animation speed">
+          <button class="speed-btn" data-speed="0.5" title="2× slower">0.5×</button>
+          <button class="speed-btn active" data-speed="1" title="Normal speed">1×</button>
+          <button class="speed-btn" data-speed="2" title="2× faster">2×</button>
+        </div>
+      </div>
       <div id="map-legend" aria-hidden="true">
         <span class="legend-label" id="legend-title" data-i18n="legend.articles">articles / country</span>
         <span class="legend-label" data-i18n="legend.none">0</span>

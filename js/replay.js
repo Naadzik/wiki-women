@@ -17,6 +17,7 @@ let _minDate    = null;
 let _timer      = null;
 let _idx        = 0;
 let _playing    = false;
+let _speed      = 1;    // playback multiplier: 0.5 = 2× slower, 2 = 2× faster
 
 export function init(data) {
   _data = data;
@@ -28,6 +29,21 @@ export function init(data) {
   if (_minDate >= last) _minDate = created[0];   // safety fallback
   _frameDates = buildFrames(_minDate, last, FRAME_COUNT);
   document.getElementById('btn-replay')?.addEventListener('click', toggle);
+  document.querySelectorAll('#replay-speed .speed-btn').forEach(btn => {
+    btn.addEventListener('click', () => setSpeed(parseFloat(btn.dataset.speed)));
+  });
+}
+
+/** Change playback speed; takes effect immediately, even mid-animation. */
+function setSpeed(s) {
+  _speed = s;
+  document.querySelectorAll('#replay-speed .speed-btn').forEach(b => {
+    b.classList.toggle('active', parseFloat(b.dataset.speed) === s);
+  });
+  if (_playing) {
+    clearInterval(_timer);
+    _timer = setInterval(step, FRAME_MS / _speed);
+  }
 }
 
 // ── Frame setup ───────────────────────────────────────────────────────────────
@@ -65,7 +81,7 @@ function play() {
   if (_idx >= _frameDates.length) _idx = 0;   // restart when finished
   document.getElementById('replay-overlay')?.removeAttribute('hidden');
   step();                                      // render the first frame immediately
-  _timer = setInterval(step, FRAME_MS);
+  _timer = setInterval(step, FRAME_MS / _speed);
 }
 
 function pause() {
@@ -106,10 +122,16 @@ function updateOverlay(date) {
   // created date always), so the counter never disagrees with what's on screen.
   const present = (a) => !a.created || a.created <= date;
 
+  // When a continent is selected, the map is scoped to it — scope the counters
+  // to match (same rule applyFilters uses: keep only countries in the iso3 set).
+  const cont = state.activeFilters.continent;   // null | Set<iso3>
+  const inScope = (c) => !cont || (c.iso3 && cont.has(c.iso3));
+
   const titles = new Set();
   let countries = 0;
   // Countries = UN members with ≥1 article by this date (the headline claim)
   for (const c of _data.countries) {
+    if (!inScope(c)) continue;
     let has = false;
     for (const a of c.articles) {
       if (present(a)) { titles.add(a.title); has = true; }
@@ -118,6 +140,7 @@ function updateOverlay(date) {
   }
   // Include disputed territories' articles in the unique-article tally
   for (const c of _data.unrecognized) {
+    if (!inScope(c)) continue;
     for (const a of c.articles) {
       if (present(a)) titles.add(a.title);
     }
