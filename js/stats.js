@@ -20,6 +20,7 @@ export function update(filteredData, meta) {
   const totalCw  = uniqueArticles.flatMap(a => a.awards).filter(a => a.type === 'cw').length;
   const totalDa  = uniqueArticles.flatMap(a => a.awards).filter(a => a.type === 'da').length;
   const totalAnm = uniqueArticles.flatMap(a => a.awards).filter(a => a.type === 'anm').length;
+  const totalFirstWomen = uniqueArticles.filter(a => a.isFirstWoman).length;
 
   // UN coverage: how many UN members have ≥1 article vs total UN members in raw data
   const unTotal = meta?.unMembersTotal ?? 193;
@@ -31,6 +32,7 @@ export function update(filteredData, meta) {
   setText('stat-cw',  totalCw);
   setText('stat-da',  totalDa);
   setText('stat-anm', totalAnm);
+  setText('stat-firstwomen', totalFirstWomen);
 }
 
 function setText(id, val) {

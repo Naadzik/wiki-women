@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kobiety w polityce — Wikipedia</title>
-  <meta name="description" content="Interaktywna mapa biogramów kobiet-polityczek z każdego kraju świata na polskojęzycznej Wikipedii.">
+  <title>Women in Politics — Wikipedia</title>
+  <meta name="description" content="Interactive world map of biographies of women in politics — one from every country in the world — on Polish Wikipedia.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%97%BA%EF%B8%8F%3C/text%3E%3C/svg%3E">
+  <meta property="og:title" content="Women in Politics — Polish Wikipedia">
+  <meta property="og:description" content="An interactive world map: a biography of a woman in politics from every country in the world.">
+  <meta property="og:type" content="website">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -251,7 +255,8 @@
     naadzik.github.io
   </a>
   <span class="nav-sep">/</span>
-  <span class="nav-title">Kobiety w polityce — Wikipedia</span>
+  <span class="nav-title" data-i18n="navTitle">Women in Politics — Wikipedia</span>
+  <button class="gh" id="ls-lang" type="button" title="Switch language / Zmień język">PL</button>
   <a class="gh" href="https://github.com/Naadzik" target="_blank" rel="noopener">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
       <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.167 6.839 9.49.5.092.682-.217.682-.482
@@ -270,15 +275,16 @@
 <main>
 
   <section class="hero">
-    <span class="badge">Dane aktualne</span>
-    <h1>Kobiety w polityce<br>na polskiej <em>Wikipedii</em></h1>
-    <p class="lead">
-      Interaktywna mapa świata pokazująca biogramy kobiet w polityce
-      napisane przez  <a href="https://pl.wikipedia.org/wiki/Wikipedysta:Nadzik" target="_blank" rel="noopener">Wikipedysta:Nadzik</a>. Filtruj po kraju, wyróżnieniach,
-      akcjach edycyjnych i dacie – wszystko w jednym miejscu.
+    <span class="badge" id="ls-badge" data-i18n="badge">Live data</span>
+    <h1 data-i18n-html="heroTitle">Women in politics<br>on Polish <em>Wikipedia</em></h1>
+    <p class="lead" data-i18n-html="lead">
+      An interactive world map of biographies of women in politics written by
+      <a href="https://meta.wikimedia.org/wiki/User:Nadzik" target="_blank" rel="noopener">User:Nadzik</a> —
+      one from every country in the world. Filter by country, awards, editorial
+      drives and date.
     </p>
-    <a class="btn-primary" href="app.html">
-      Otwórz mapę
+    <a class="btn-primary ls-open" href="app.html">
+      <span data-i18n="openMap">Open the map</span>
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
         <path d="M5 12h14M12 5l7 7-7 7"/>
       </svg>
@@ -286,63 +292,67 @@
 
     <div class="stats">
       <div class="stat-item">
-        <span class="stat-value blue">415</span>
-        <span class="stat-label">Artykułów</span>
+        <span class="stat-value blue" id="ls-articles">–</span>
+        <span class="stat-label" data-i18n="stArticles">Articles</span>
       </div>
       <div class="stat-item">
-        <span class="stat-value">100%</span>
-        <span class="stat-label">Państw</span>
+        <span class="stat-value" id="ls-coverage">–</span>
+        <span class="stat-label" data-i18n="stCoverage">UN coverage</span>
       </div>
       <div class="stat-item">
-        <span class="stat-value gold">231</span>
-        <span class="stat-label">Wyróżnień</span>
+        <span class="stat-value gold" id="ls-awards">–</span>
+        <span class="stat-label" data-i18n="stAwards">Awards</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="ls-firstwomen" style="color:var(--gold)">–</span>
+        <span class="stat-label" data-i18n="stFirstWomen">First women</span>
       </div>
     </div>
   </section>
 
   <section class="features-section">
-    <p class="section-label">Co zawiera narzędzie</p>
+    <p class="section-label" data-i18n="featuresLabel">What the tool offers</p>
     <div class="features">
       <div class="feature">
         <span class="feature-icon">🗺️</span>
-        <h3>Kartogram</h3>
-        <p>Interaktywna mapa świata wskazująca liczbę artykułów oraz ich wyróżnień. Kliknij kraj, by zobaczyć pełną listę biogramów.</p>
+        <h3 data-i18n="f1title">Choropleth map</h3>
+        <p data-i18n="f1body">An interactive world map showing article and award counts. Click a country to see its full list of biographies.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">▶️</span>
+        <h3 data-i18n="f2title">Replay the year</h3>
+        <p data-i18n="f2body">Watch the map fill in day by day as the 365-day project unfolds, with a live article and country counter.</p>
       </div>
       <div class="feature">
         <span class="feature-icon">🔍</span>
-        <h3>Filtry i wyszukiwanie</h3>
-        <p>Filtruj po wyróżnieniach (CW, DA, ANM), akcjach edycyjnych (CEE Spring, Tygodnie tematyczne…) i datach.</p>
+        <h3 data-i18n="f3title">Filters &amp; search</h3>
+        <p data-i18n="f3body">Filter by awards (CW, DA, ANM), editorial drives (CEE Spring, Thematic Weeks…), first women in role, and date.</p>
       </div>
       <div class="feature">
         <span class="feature-icon">📈</span>
-        <h3>Wykresy w czasie</h3>
-        <p>Śledź skumulowane wyróżnienia „Czy wiesz" oraz liczbę tworzonych artykułów.</p>
-      </div>
-      <div class="feature">
-        <span class="feature-icon">🌍</span>
-        <h3>Zoom kontynentalny</h3>
-        <p>Sprawdź jak wygląda pokrycie poszczególnych części świata.</p>
+        <h3 data-i18n="f4title">Charts over time</h3>
+        <p data-i18n="f4body">Track cumulative "Did You Know" awards and the number of articles created.</p>
       </div>
     </div>
   </section>
 
   <section class="awards-section">
-    <p class="section-label">Typy wyróżnień</p>
+    <p class="section-label" data-i18n="awardsLabel">Award types</p>
     <div class="awards-grid">
-      <span class="award-chip cw">✦ Czy wiesz <span class="count">231 artykułów</span></span>
-      <span class="award-chip da">★ Dobry artykuł <span class="count">2 artykuły</span></span>
-      <span class="award-chip anm">★★ Artykuł na medal <span class="count">1 artykuł</span></span>
+      <span class="award-chip cw">✦ <span data-i18n="awCw">Did You Know</span> <span class="count" id="ls-cw">–</span></span>
+      <span class="award-chip da">★ <span data-i18n="awDa">Good Article</span> <span class="count" id="ls-da">–</span></span>
+      <span class="award-chip anm">★★ <span data-i18n="awAnm">Featured Article</span> <span class="count" id="ls-anm">–</span></span>
     </div>
   </section>
 
   <div class="bottom-cta">
-    <a class="btn-primary" href="app.html">
-      Otwórz mapę
+    <a class="btn-primary ls-open" href="app.html">
+      <span data-i18n="openMap">Open the map</span>
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
         <path d="M5 12h14M12 5l7 7-7 7"/>
       </svg>
     </a>
-    <p>Działa w przeglądarce &nbsp;·&nbsp; bez rejestracji</p>
+    <p data-i18n="ctaNote">Runs in your browser &nbsp;·&nbsp; no sign-up</p>
   </div>
 
 </main>
@@ -350,10 +360,104 @@
 <footer>
   <a href="https://naadzik.github.io/">naadzik.github.io</a>
   &nbsp;·&nbsp;
-  <a href="https://pl.wikipedia.org/wiki/Wikipedysta:Nadzik" target="_blank" rel="noopener">Wikipedysta:Nadzik</a>
+  <a href="https://pl.wikipedia.org/wiki/Wikipedysta:Nadzik" target="_blank" rel="noopener" data-i18n="footUser">User:Nadzik</a>
   &nbsp;·&nbsp;
-  <a href="https://meta.wikimedia.org/wiki/Grants:Project/Nadzik/Kobiety_w_polityce" target="_blank" rel="noopener">Projekt „Dookoła świata"</a>
+  <a href="https://meta.wikimedia.org/wiki/Grants:Project/Nadzik/Kobiety_w_polityce" target="_blank" rel="noopener" data-i18n="footProject">"Around the World" project</a>
 </footer>
+
+<script>
+  const I18N = {
+    en: {
+      navTitle: 'Women in Politics — Wikipedia',
+      badge: 'Live data',
+      heroTitle: 'Women in politics<br>on Polish <em>Wikipedia</em>',
+      lead: 'An interactive world map of biographies of women in politics written by <a href="https://meta.wikimedia.org/wiki/User:Nadzik" target="_blank" rel="noopener">User:Nadzik</a> — one from every country in the world. Filter by country, awards, editorial drives and date.',
+      openMap: 'Open the map',
+      stArticles: 'Articles', stCoverage: 'UN coverage', stAwards: 'Awards', stFirstWomen: 'First women',
+      featuresLabel: 'What the tool offers',
+      f1title: 'Choropleth map', f1body: 'An interactive world map showing article and award counts. Click a country to see its full list of biographies.',
+      f2title: 'Replay the year', f2body: 'Watch the map fill in day by day as the 365-day project unfolds, with a live article and country counter.',
+      f3title: 'Filters & search', f3body: 'Filter by awards (CW, DA, ANM), editorial drives (CEE Spring, Thematic Weeks…), first women in role, and date.',
+      f4title: 'Charts over time', f4body: 'Track cumulative "Did You Know" awards and the number of articles created.',
+      awardsLabel: 'Award types', awCw: 'Did You Know', awDa: 'Good Article', awAnm: 'Featured Article',
+      ctaNote: 'Runs in your browser  ·  no sign-up',
+      footUser: 'User:Nadzik', footProject: '"Around the World" project',
+      badgeDate: d => 'Live data · ' + d,
+    },
+    pl: {
+      navTitle: 'Kobiety w polityce — Wikipedia',
+      badge: 'Dane aktualne',
+      heroTitle: 'Kobiety w polityce<br>na polskiej <em>Wikipedii</em>',
+      lead: 'Interaktywna mapa świata pokazująca biogramy kobiet w polityce napisane przez <a href="https://pl.wikipedia.org/wiki/Wikipedysta:Nadzik" target="_blank" rel="noopener">Wikipedysta:Nadzik</a> — po jednym z każdego kraju świata. Filtruj po kraju, wyróżnieniach, akcjach edycyjnych i dacie.',
+      openMap: 'Otwórz mapę',
+      stArticles: 'Artykułów', stCoverage: 'Pokrycie ONZ', stAwards: 'Wyróżnień', stFirstWomen: 'Pierwsze kobiety',
+      featuresLabel: 'Co zawiera narzędzie',
+      f1title: 'Kartogram', f1body: 'Interaktywna mapa świata wskazująca liczbę artykułów oraz ich wyróżnień. Kliknij kraj, by zobaczyć pełną listę biogramów.',
+      f2title: 'Odtwórz rok', f2body: 'Zobacz, jak mapa wypełnia się dzień po dniu w trakcie 365-dniowego projektu, z licznikiem artykułów i państw.',
+      f3title: 'Filtry i wyszukiwanie', f3body: 'Filtruj po wyróżnieniach (CW, DA, ANM), akcjach edycyjnych (CEE Spring, Tygodnie tematyczne…), pierwszych kobietach i datach.',
+      f4title: 'Wykresy w czasie', f4body: 'Śledź skumulowane wyróżnienia „Czy wiesz" oraz liczbę tworzonych artykułów.',
+      awardsLabel: 'Typy wyróżnień', awCw: 'Czy wiesz', awDa: 'Dobry artykuł', awAnm: 'Artykuł na medal',
+      ctaNote: 'Działa w przeglądarce  ·  bez rejestracji',
+      footUser: 'Wikipedysta:Nadzik', footProject: 'Projekt „Dookoła świata"',
+      badgeDate: d => 'Dane na dzień · ' + d,
+    },
+  };
+
+  const params = new URLSearchParams(location.search);
+  let lang = params.get('lang');
+  if (lang !== 'en' && lang !== 'pl') lang = localStorage.getItem('ww-lang') || 'en';
+  let genDate = '';
+
+  function applyLang() {
+    const dict = I18N[lang];
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = dict[el.dataset.i18n] ?? el.textContent; });
+    document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = dict[el.dataset.i18nHtml] ?? el.innerHTML; });
+    document.title = dict.navTitle;
+    document.getElementById('ls-lang').textContent = lang === 'en' ? 'PL' : 'EN';
+    // App links carry the language so the map opens in the same locale
+    document.querySelectorAll('.ls-open').forEach(a => { a.href = 'app.html?lang=' + lang; });
+    if (genDate) document.getElementById('ls-badge').textContent = dict.badgeDate(genDate);
+  }
+
+  document.getElementById('ls-lang').addEventListener('click', () => {
+    lang = lang === 'en' ? 'pl' : 'en';
+    localStorage.setItem('ww-lang', lang);
+    applyLang();
+  });
+
+  applyLang();
+
+  // Live stats from the same data file the app uses — never goes stale.
+  fetch('data/wikiwomen.json').then(r => r.json()).then(data => {
+    const titles = new Set();
+    let cw = 0, da = 0, anm = 0, firstWomen = 0;
+    for (const c of [...data.countries, ...data.unrecognized]) {
+      for (const a of c.articles) {
+        if (titles.has(a.title)) continue;
+        titles.add(a.title);
+        for (const w of a.awards) {
+          if (w.type === 'cw') cw++; else if (w.type === 'da') da++; else if (w.type === 'anm') anm++;
+        }
+        if (a.isFirstWoman) firstWomen++;
+      }
+    }
+    const covered = data.countries.filter(c => c.articles.length > 0).length;
+    const coverage = Math.round((covered / 193) * 100);
+
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    set('ls-articles', titles.size);
+    set('ls-coverage', coverage + '%');
+    set('ls-awards', cw + da + anm);
+    set('ls-firstwomen', firstWomen);
+    set('ls-cw', '×' + cw);
+    set('ls-da', '×' + da);
+    set('ls-anm', '×' + anm);
+
+    genDate = (data.meta?.generatedAt || '').slice(0, 10);
+    if (genDate) document.getElementById('ls-badge').textContent = I18N[lang].badgeDate(genDate);
+  }).catch(() => { /* keep placeholder dashes if data can't load */ });
+</script>
 
 </body>
 </html>

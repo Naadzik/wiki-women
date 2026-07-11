@@ -1,11 +1,12 @@
 // app.js — entry point, global state, pub/sub wiring
-import * as i18n   from './i18n.js?v=13';
-import * as stats  from './stats.js?v=13';
-import * as filters from './filters.js?v=13';
-import * as search  from './search.js?v=13';
-import * as map     from './map.js?v=13';
-import * as panel   from './panel.js?v=13';
-import * as timeline from './timeline.js?v=13';
+import * as i18n   from './i18n.js?v=14';
+import * as stats  from './stats.js?v=14';
+import * as filters from './filters.js?v=14';
+import * as search  from './search.js?v=14';
+import * as map     from './map.js?v=14';
+import * as panel   from './panel.js?v=14';
+import * as timeline from './timeline.js?v=14';
+import * as replay   from './replay.js?v=14';
 
 // ── Continent definitions ─────────────────────────────────────────────────────
 
@@ -55,11 +56,29 @@ const CONTINENT_BOUNDS = {
   antarctica:    [[-180, -90], [180, -55]],
 };
 
+// ── URL overrides ───────────────────────────────────────────────────────────
+// Query params win over localStorage so a link on a slide / QR code opens the
+// app in a deterministic state, e.g. app.html?lang=en&theme=light&present
+const _params = new URLSearchParams(location.search);
+
+function initialLang() {
+  const p = _params.get('lang');
+  if (p === 'en' || p === 'pl') return p;
+  return localStorage.getItem('ww-lang') || 'en';
+}
+function initialDark() {
+  const p = _params.get('theme');
+  if (p === 'dark')  return true;
+  if (p === 'light') return false;
+  return localStorage.getItem('ww-dark') === 'true';
+}
+
 // ── Global state ──────────────────────────────────────────────────────────────
 export const state = {
-  lang:      localStorage.getItem('ww-lang')      || 'en',
-  darkMode:  localStorage.getItem('ww-dark') === 'true',
+  lang:      initialLang(),
+  darkMode:  initialDark(),
   colorMode: 'articles',   // 'articles' | 'awards'
+  presentMode: _params.has('present'),
   selectedCountry: null,       // iso3 string (or namePolish for null-iso3 entries)
   panelMode: 'list',           // 'list' | 'country' | 'special' | 'award-date'
   awardDateContext: null,      // { type, date } when panelMode === 'award-date'
@@ -68,6 +87,7 @@ export const state = {
     editorialActions: [],  // e.g. ['cee2025']
     awardTypes:       [],  // e.g. ['cw']
     noAwards:         false,
+    firstWomen:       false,
     search:           '',
     continent:        null,   // null | Set<iso3>
     asOfDate:         null,   // null | 'YYYY-MM-DD'
@@ -82,12 +102,19 @@ let _prevContinent = undefined;
 
 // ── Filter logic ──────────────────────────────────────────────────────────────
 export function applyFilters(data) {
-  const { editorialActions, awardTypes, noAwards, search: q, continent, asOfDate } = state.activeFilters;
+  const { editorialActions, awardTypes, noAwards, firstWomen, search: q, continent, asOfDate } = state.activeFilters;
   const sq = q.trim().toLowerCase();
 
   const filterCountry = (country) => {
     // Continent filter
     if (continent !== null && (!country.iso3 || !continent.has(country.iso3))) return null;
+
+    // Country name match: a search that matches the country name keeps all its
+    // articles (so typing "Tuvalu" surfaces the country, not just article titles).
+    const countryNameMatch = !!sq && (
+      (country.nameEnglish && country.nameEnglish.toLowerCase().includes(sq)) ||
+      (country.namePolish  && country.namePolish.toLowerCase().includes(sq))
+    );
 
     // Apply asOfDate: keep only articles created on/before the date,
     // and strip awards given after the date. Articles with no created date are always kept.
@@ -113,11 +140,15 @@ export function applyFilters(data) {
         awardTypes.length === 0 ||
         article.awards.some(a => awardTypes.includes(a.type));
 
+      const matchesFirstWoman =
+        !firstWomen || article.isFirstWoman;
+
       const matchesSearch =
         !sq ||
+        countryNameMatch ||
         article.title.toLowerCase().includes(sq);
 
-      return matchesAction && matchesAward && matchesSearch;
+      return matchesAction && matchesAward && matchesFirstWoman && matchesSearch;
     });
 
     if (filtered.length === 0) return null;
@@ -313,12 +344,23 @@ function onDarkToggle() {
   // Swap icon
   document.getElementById('icon-dark').style.display  = state.darkMode ? 'none'  : '';
   document.getElementById('icon-light').style.display = state.darkMode ? ''      : 'none';
-  // Chart colors depend on dark mode — re-init timeline
-  if (_data) timeline.applyTheme();
+  // Chart + map colours depend on dark mode — re-theme both
+  if (_data) { timeline.applyTheme(); map.applyTheme(); }
 }
 
 function applyDarkMode() {
   document.documentElement.classList.toggle('dark', state.darkMode);
+}
+
+/** Toggle presentation mode (larger fonts, collapsible filters for projectors). */
+function applyPresentMode() {
+  document.body.classList.toggle('present', state.presentMode);
+  document.getElementById('btn-present')?.classList.toggle('active', state.presentMode);
+}
+
+function togglePresentMode() {
+  state.presentMode = !state.presentMode;
+  applyPresentMode();
 }
 
 /** Called when color mode (by articles / by awards) changes. */
@@ -373,6 +415,9 @@ async function boot() {
     document.getElementById('icon-light').style.display = '';
   }
 
+  // Apply presentation mode if requested via ?present
+  applyPresentMode();
+
   // Measure header height for sticky panel positioning
   syncHeaderHeight();
   window.addEventListener('resize', syncHeaderHeight);
@@ -385,11 +430,28 @@ async function boot() {
   // Wire static controls
   document.getElementById('btn-lang').addEventListener('click', onLangToggle);
   document.getElementById('btn-dark').addEventListener('click', onDarkToggle);
+  document.getElementById('btn-present')?.addEventListener('click', togglePresentMode);
   document.querySelectorAll('.mode-btn').forEach(btn => {
     btn.addEventListener('click', () => onColorModeChange(btn.dataset.mode));
   });
   document.getElementById('panel-close')?.addEventListener('click', onPanelClose);
   syncBackButton();
+
+  // Keyboard shortcut: P toggles presentation mode (ignored while typing)
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'p' && e.key !== 'P') return;
+    const el = document.activeElement;
+    if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) return;
+    togglePresentMode();
+  });
+
+  // First-women stat chip toggles the first-woman filter
+  document.getElementById('stat-firstwomen-btn')?.addEventListener('click', () => {
+    if (!_data) return;
+    state.activeFilters.firstWomen = !state.activeFilters.firstWomen;
+    document.getElementById('btn-first-women')?.classList.toggle('active', state.activeFilters.firstWomen);
+    onFilterChange();
+  });
   document.getElementById('stat-countries-btn')?.addEventListener('click', () => {
     if (!_data) return;
     state.selectedCountry = null;
@@ -427,6 +489,7 @@ async function boot() {
   panel.showCountriesList(filtered);
 
   timeline.init(_data.cwTimeline, _data.createdTimeline);
+  replay.init(_data);
 
   // Wire continent buttons
   document.querySelectorAll('.continent-btn[data-continent]').forEach(btn => {

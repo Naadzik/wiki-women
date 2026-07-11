@@ -1,3 +1,16 @@
+> **Implementation status (this branch).** The recommended pre-talk scope has been
+> built and browser-tested (projector resolutions, both themes, EN/PL, and a
+> fully offline network). Shipped: **#1** vendored CDN deps (app now runs with zero
+> internet), **#2** live landing-page stats, **#3** bilingual landing page, **#4**
+> `?lang`/`?theme` URL overrides, **#5** replay-the-year animation, **#6** presentation
+> mode (`P` / `?present`), **#7** first-woman stat + filter, **#11** micro-state dots +
+> country-name search, **#13** dark-mode choropleth fix, **#14** legend labels, **#15**
+> header subtitle, **#17** unified cache-bust version + a latent language-switch crash
+> fixed. Still open (heavier / needs assets or decisions): **#8** deep-link hash state,
+> **#9** OpenGraph preview image (meta tags added; image still needed), **#10** SVG
+> flags for Windows, **#16** French locale, PL plural rules, and regenerating the data
+> file right before the conference. See the table at the end for the full list.
+
 # Wikimania 2026 presentation-readiness proposal
 
 Changes to make this app the best possible live demo for the Wikimania 2026 session

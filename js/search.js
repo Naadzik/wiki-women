@@ -1,5 +1,5 @@
 // search.js — debounced search input
-import { state, onFilterChange } from './app.js?v=11';
+import { state, onFilterChange } from './app.js?v=14';
 
 const DEBOUNCE_MS = 220;
 let _timer = null;

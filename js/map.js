@@ -1,8 +1,9 @@
 // map.js — D3 choropleth world map
-import { state, onCountryClick, buildCountryMap } from './app.js?v=11';
-import { t, getLang } from './i18n.js?v=11';
+import { state, onCountryClick, buildCountryMap } from './app.js?v=14';
+import { t, getLang } from './i18n.js?v=14';
 
-const WORLD_ATLAS_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
+// Vendored locally (was cdn.jsdelivr.net/npm/world-atlas@2) so the map loads offline.
+const WORLD_ATLAS_URL = 'data/countries-110m.json?v=14';
 
 // ── ISO numeric → alpha-3 lookup ─────────────────────────────────────────────
 // Source: ISO 3166-1 (selected entries covering the dataset)
@@ -181,6 +182,20 @@ function featureKey(d) {
   return NUM_TO_ISO3[+d.id] ?? FEATURE_NAME_TO_KEY[d.properties?.name];
 }
 
+// Micro-states and small island nations that are invisible (or absent) at
+// 110m resolution. They carry the talk's "every country" claim, so we draw a
+// clickable dot at these [lon, lat] positions regardless of polygon size.
+const MICROSTATE_COORDS = {
+  AND:[1.52,42.55], ATG:[-61.80,17.12], BHR:[50.55,26.07], BRB:[-59.54,13.19],
+  CPV:[-23.62,15.12], COM:[43.33,-11.65], DMA:[-61.37,15.41], GRD:[-61.68,12.12],
+  KIR:[-157.36,1.87], LIE:[9.55,47.16], MDV:[73.51,3.20], MHL:[171.18,7.13],
+  MLT:[14.38,35.90], MCO:[7.42,43.74], FSM:[158.16,6.92], NRU:[166.93,-0.52],
+  PLW:[134.58,7.51], KNA:[-62.73,17.30], LCA:[-60.98,13.91], VCT:[-61.20,13.25],
+  WSM:[-172.10,-13.76], SMR:[12.46,43.94], STP:[6.61,0.19], SYC:[55.49,-4.68],
+  SGP:[103.82,1.35], TON:[-175.20,-21.18], TUV:[178.68,-8.52], VAT:[12.45,41.90],
+  MUS:[57.55,-20.35], BHS:[-77.40,25.03], XKX:[20.90,42.60],
+};
+
 // ── State ────────────────────────────────────────────────────────────────────
 let _svg, _path, _projection, _zoom;
 let _countryDataMap = new Map();  // iso3 → country object (filtered)
@@ -191,12 +206,22 @@ let _onDblClickResetCb = null;
 
 // ── Colour helpers ───────────────────────────────────────────────────────────
 
+function isDark() {
+  return document.documentElement.classList.contains('dark');
+}
+
+// In light mode we ramp light→dark (interpolateBlues/Oranges). On a dark
+// background that makes the highest-value countries read as near-black holes,
+// so in dark mode we ramp a visible dark tone → a bright tone instead.
+const ARTICLES_DARK = d3.interpolateRgb('#17385c', '#7dc0ff');
+const AWARDS_DARK    = d3.interpolateRgb('#5c3410', '#ffab5e');
+
 function articlesColor(count) {
   if (!count) return 'var(--map-no-data)';
   const scale = d3.scaleSequentialSqrt()
     .domain([0, Math.max(_maxArticles, 1)])
-    .interpolator(d3.interpolateBlues);
-  // Ensure count=1 is always visible (floor at 0.15)
+    .interpolator(isDark() ? ARTICLES_DARK : d3.interpolateBlues);
+  // Ensure count=1 is always visible (floor at 8% of the scale)
   return scale(Math.max(count, _maxArticles * 0.08));
 }
 
@@ -204,21 +229,24 @@ function awardsColor(count) {
   if (!count) return 'var(--map-no-data)';
   const scale = d3.scaleSequentialSqrt()
     .domain([0, Math.max(_maxAwards, 1)])
-    .interpolator(d3.interpolateOranges);
+    .interpolator(isDark() ? AWARDS_DARK : d3.interpolateOranges);
   return scale(Math.max(count, _maxAwards * 0.08));
+}
+
+/** Colour for a data key (iso3/namePolish) using the current colour mode. */
+function colorForKey(key) {
+  const country = _countryDataMap.get(key);
+  if (!country) return 'var(--map-no-data)';
+  if (state.colorMode === 'awards') {
+    return awardsColor(country.articles.flatMap(a => a.awards).length);
+  }
+  return articlesColor(country.articles.length);
 }
 
 function colorForFeature(d) {
   const key = featureKey(d);
   if (!key) return 'var(--map-no-data)';
-  const country = _countryDataMap.get(key);
-  if (!country) return 'var(--map-no-data)';
-
-  if (state.colorMode === 'awards') {
-    const awards = country.articles.flatMap(a => a.awards).length;
-    return awardsColor(awards);
-  }
-  return articlesColor(country.articles.length);
+  return colorForKey(key);
 }
 
 function getCountryStats(iso3) {
@@ -233,18 +261,18 @@ function getCountryStats(iso3) {
 // ── Legend ───────────────────────────────────────────────────────────────────
 
 function updateLegend() {
-  const maxVal = state.colorMode === 'awards' ? _maxAwards : _maxArticles;
+  const awards = state.colorMode === 'awards';
+  const maxVal = awards ? _maxAwards : _maxArticles;
   document.getElementById('legend-max').textContent = maxVal;
+
+  const title = document.getElementById('legend-title');
+  if (title) title.textContent = t(awards ? 'legend.awards' : 'legend.articles');
+
   const grad = document.getElementById('legend-gradient');
-  if (state.colorMode === 'awards') {
-    grad.style.background = document.documentElement.classList.contains('dark')
-      ? 'linear-gradient(to right, var(--map-no-data), #e6550d)'
-      : 'linear-gradient(to right, var(--map-no-data), #e6550d)';
-  } else {
-    grad.style.background = document.documentElement.classList.contains('dark')
-      ? 'linear-gradient(to right, var(--map-no-data), #4ea8ff)'
-      : 'linear-gradient(to right, var(--map-no-data), #084594)';
-  }
+  const high = awards
+    ? (isDark() ? '#ffab5e' : '#e6550d')
+    : (isDark() ? '#7dc0ff' : '#084594');
+  grad.style.background = `linear-gradient(to right, var(--map-no-data), ${high})`;
 }
 
 // ── Tooltip ──────────────────────────────────────────────────────────────────
@@ -355,6 +383,9 @@ export async function init(filteredData, rawData) {
     .attr('class', 'map-borders')
     .attr('d', _path);
 
+  // Draw clickable dots for micro-states (invisible/absent at this resolution)
+  drawDots();
+
   // Hide loading spinner
   const loader = document.getElementById('map-loading');
   loader.classList.add('hidden');
@@ -366,11 +397,14 @@ export async function init(filteredData, rawData) {
   _zoom = d3.zoom()
     .scaleExtent([1, 8])
     .on('zoom', (event) => {
+      const k = event.transform.k;
       g.attr('transform', event.transform);
       borders.attr('transform', event.transform);
-      // Scale stroke width inversely
-      g.selectAll('.country-path')
-        .attr('stroke-width', 0.4 / event.transform.k);
+      _svg.select('#map-dots').attr('transform', event.transform);
+      // Scale stroke width / dot radius inversely so they stay constant on screen
+      g.selectAll('.country-path').attr('stroke-width', 0.4 / k);
+      _svg.select('#map-dots').selectAll('circle.micro-dot')
+        .attr('r', DOT_RADIUS / k).attr('stroke-width', 0.8 / k);
     });
 
   _svg.call(_zoom);
@@ -393,6 +427,36 @@ export function update(filteredData) {
   _svg?.select('#map-countries').selectAll('path.country-path')
     .transition().duration(350)
     .attr('fill', d => colorForFeature(d));
+
+  _svg?.select('#map-dots').selectAll('circle.micro-dot')
+    .transition().duration(350)
+    .attr('fill', d => colorForKey(d.key));
+}
+
+// ── Micro-state dots ──────────────────────────────────────────────────────────
+
+const DOT_RADIUS = 2.6;
+
+function drawDots() {
+  const dotData = Object.entries(MICROSTATE_COORDS)
+    .filter(([key]) => _rawDataMap.has(key))
+    .map(([key, lonlat]) => ({ key, pos: _projection(lonlat) }))
+    .filter(d => d.pos);
+
+  _svg.select('#map-dots').selectAll('circle.micro-dot')
+    .data(dotData, d => d.key)
+    .join('circle')
+    .attr('class', 'micro-dot')
+    .attr('cx', d => d.pos[0])
+    .attr('cy', d => d.pos[1])
+    .attr('r', DOT_RADIUS)
+    .attr('fill', d => colorForKey(d.key))
+    .on('mousemove', (event, d) => showTooltip(event, d.key))
+    .on('mouseleave', hideTooltip)
+    .on('click', (event, d) => {
+      event.stopPropagation();
+      onCountryClick(d.key);
+    });
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -415,10 +479,13 @@ export function highlightRelated(iso3, relatedKeys) {
       if (!key || key === iso3) return false;
       return !relatedKeys.has(key);
     });
+  _svg?.select('#map-dots').selectAll('circle.micro-dot')
+    .classed('selected', d => d.key === iso3)
+    .classed('dimmed', d => d.key !== iso3 && !relatedKeys.has(d.key));
 }
 
 export function deselectAll() {
-  _svg?.select('#map-countries').selectAll('path.country-path')
+  _svg?.selectAll('path.country-path, circle.micro-dot')
     .classed('selected', false)
     .classed('dimmed', false);
 }
@@ -432,10 +499,22 @@ export function highlightSet(keys) {
       if (!key) return false;
       return !keys.has(key);
     });
+  _svg?.select('#map-dots').selectAll('circle.micro-dot')
+    .classed('selected', false)
+    .classed('dimmed', d => !keys.has(d.key));
 }
 
 export function updateTooltipLang() {
   // Tooltip re-renders on next mousemove — nothing to do proactively
+}
+
+/** Recolour the map for the current theme (light/dark ramps differ). */
+export function applyTheme() {
+  updateLegend();
+  _svg?.select('#map-countries').selectAll('path.country-path')
+    .attr('fill', d => colorForFeature(d));
+  _svg?.select('#map-dots').selectAll('circle.micro-dot')
+    .attr('fill', d => colorForKey(d.key));
 }
 
 /** Register a callback to be called when the user double-clicks (zoom reset). */
