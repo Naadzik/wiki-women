@@ -1,6 +1,6 @@
 // filters.js — editorial-action filter buttons + clear all
-import { state, onFilterChange } from './app.js?v=11';
-import { t } from './i18n.js?v=11';
+import { state, onFilterChange } from './app.js?v=14';
+import { t } from './i18n.js?v=14';
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let _rawData = null;
@@ -12,8 +12,16 @@ export function init(rawData, filteredData) {
   renderActionButtons(rawData);
   wireAwardButtons();
   wireNoAwardsButton();
+  wireFirstWomenButton();
   wireDateInput(rawData);
   wireClearButton();
+  updateCounts(filteredData);
+}
+
+/** Re-render translated filter controls after a language switch. */
+export function render(rawData, filteredData) {
+  renderActionButtons(rawData);
+  syncActiveStates();
   updateCounts(filteredData);
 }
 
@@ -76,6 +84,10 @@ function wireAwardButtons() {
 
 function wireNoAwardsButton() {
   document.getElementById('btn-no-awards')?.addEventListener('click', toggleNoAwards);
+}
+
+function wireFirstWomenButton() {
+  document.getElementById('btn-first-women')?.addEventListener('click', toggleFirstWomen);
 }
 
 // ── Wire date input ───────────────────────────────────────────────────────────
@@ -161,10 +173,17 @@ function toggleNoAwards() {
   onFilterChange();
 }
 
+function toggleFirstWomen() {
+  state.activeFilters.firstWomen = !state.activeFilters.firstWomen;
+  syncActiveStates();
+  onFilterChange();
+}
+
 function clearAll() {
   state.activeFilters.editorialActions = [];
   state.activeFilters.awardTypes = [];
   state.activeFilters.noAwards = false;
+  state.activeFilters.firstWomen = false;
   state.activeFilters.search = '';
   state.activeFilters.continent = null;
   state.activeFilters.asOfDate = null;
@@ -189,6 +208,8 @@ function syncActiveStates() {
   });
   const noAwardsBtn = document.getElementById('btn-no-awards');
   if (noAwardsBtn) noAwardsBtn.classList.toggle('active', state.activeFilters.noAwards);
+  const firstWomenBtn = document.getElementById('btn-first-women');
+  if (firstWomenBtn) firstWomenBtn.classList.toggle('active', state.activeFilters.firstWomen);
 }
 
 // ── Update article counts shown on each filter button ────────────────────────
@@ -237,4 +258,9 @@ export function updateCounts(filteredData) {
   const noAwardsCount = allRaw.filter(a => a.awards.length === 0).length;
   const noAwardsCountEl = document.getElementById('btn-no-awards')?.querySelector('.filter-count');
   if (noAwardsCountEl) noAwardsCountEl.textContent = noAwardsCount > 0 ? `(${noAwardsCount})` : '';
+
+  // First-woman count among currently filtered unique articles
+  const firstWomenCount = uniqueFiltered.filter(a => a.isFirstWoman).length;
+  const firstWomenCountEl = document.getElementById('btn-first-women')?.querySelector('.filter-count');
+  if (firstWomenCountEl) firstWomenCountEl.textContent = firstWomenCount > 0 ? `(${firstWomenCount})` : '';
 }

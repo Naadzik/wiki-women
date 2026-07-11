@@ -215,6 +215,7 @@ button {
 .stat-value.stat-cw  { color: var(--badge-cw-text); }
 .stat-value.stat-da  { color: var(--badge-da-text); }
 .stat-value.stat-anm { color: var(--badge-anm-text); }
+.stat-value.stat-fw  { color: var(--first-woman-color); }
 
 .stat-label {
   font-size: 0.68rem;
@@ -270,6 +271,7 @@ button {
   min-width: 0;
   padding: 12px 0 0;
   overflow: hidden;
+  position: relative;   /* anchor for #replay-overlay */
 }
 
 #map-controls {
@@ -315,6 +317,15 @@ button {
 
 .legend-label { min-width: 12px; text-align: center; }
 
+#legend-title {
+  min-width: 0;
+  margin-right: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
 #legend-gradient {
   width: 120px;
   height: 10px;
@@ -326,6 +337,51 @@ button {
 html.dark #legend-gradient {
   background: linear-gradient(to right, var(--map-no-data), #4ea8ff);
 }
+
+/* ── Replay control + overlay ── */
+.replay-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.replay-btn:hover { background: var(--accent); color: #fff; }
+.replay-btn.playing { background: var(--accent); color: #fff; }
+
+#replay-overlay {
+  position: absolute;
+  top: 92px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 22px;
+  border-radius: var(--radius);
+  background: var(--tooltip-bg);
+  color: var(--tooltip-text);
+  box-shadow: var(--shadow-lg);
+  pointer-events: none;
+}
+#replay-overlay[hidden] { display: none; }
+#replay-date { font-size: 1.35rem; font-weight: 700; letter-spacing: 0.02em; }
+#replay-counters {
+  display: flex;
+  gap: 16px;
+  font-size: 0.82rem;
+  opacity: 0.9;
+}
+#replay-counters b { font-size: 0.95rem; }
 
 /* Continent filter bar */
 #continent-bar {
@@ -395,6 +451,17 @@ html.dark #legend-gradient {
   opacity: 0.15;
   filter: none;
 }
+
+/* Micro-state dots (clickable markers for countries invisible at this scale) */
+.micro-dot {
+  stroke: var(--text);
+  stroke-width: 0.8;
+  cursor: pointer;
+  transition: filter var(--transition);
+}
+.micro-dot:hover { filter: brightness(0.85); }
+.micro-dot.selected { stroke-width: 1.6; }
+.micro-dot.dimmed { opacity: 0.2; }
 
 /* Map borders (country mesh) */
 .map-borders {
@@ -821,6 +888,15 @@ html.dark #legend-gradient {
   border-color: var(--accent);
   color: var(--accent);
 }
+.filter-btn--fw.active {
+  border-color: var(--first-woman-color);
+  color: var(--first-woman-color);
+}
+.filter-btn--fw::before {
+  content: '★';
+  color: var(--first-woman-color);
+  font-size: 0.7rem;
+}
 .filter-btn .filter-count {
   font-size: 0.68rem;
   color: var(--muted);
@@ -1157,6 +1233,49 @@ html.dark #legend-gradient {
 #site-footer a:hover {
   color: var(--text);
   text-decoration: underline;
+}
+
+/* ═══════════════════════════════════════════ PRESENTATION MODE (P / ?present) */
+/* Larger type and controls for projector legibility; collapses the filter and
+   chart sections so the map + stats fill the screen. Toggle with the P key. */
+
+body.present #header-subtitle { font-size: 1.15rem; }
+body.present #header-titles h1 { font-size: 1.7rem; }
+body.present .stat-value { font-size: 2rem; }
+body.present .stat-label { font-size: 0.85rem; }
+body.present .stat-item { min-width: 96px; padding: 0 22px; }
+body.present .stat-divider { height: 46px; }
+
+body.present .mode-btn,
+body.present .replay-btn,
+body.present .continent-btn { font-size: 1rem; padding: 7px 16px; }
+
+body.present #map-legend { font-size: 0.95rem; }
+body.present #legend-gradient { width: 170px; height: 14px; }
+body.present #legend-title { font-size: 0.85rem; }
+
+body.present #tooltip { font-size: 1.05rem; padding: 10px 14px; }
+body.present .tooltip-country { font-size: 1.15rem; }
+
+body.present #replay-date { font-size: 1.8rem; }
+body.present #replay-counters { font-size: 1rem; }
+
+body.present #panel-country-name { font-size: 1.4rem; }
+body.present .article-item { font-size: 1.05rem; }
+body.present .country-row { font-size: 1.02rem; }
+
+/* Collapse the dense filter and timeline sections — one keypress away when needed */
+body.present #filter-section,
+body.present #timeline-section,
+body.present #created-section { display: none; }
+
+body.present .micro-dot { stroke-width: 1.1; }
+
+/* Presentation-mode toggle button active state */
+#btn-present.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
 }
 
 /* ════════════════════════════════════════════════ PRINT (basic) */

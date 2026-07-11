@@ -4,7 +4,7 @@ const TRANSLATIONS = {
   en: {
     'header.title':        'Women in Politics — Wikipedia',
     'header.titleHtml':    'Women in politics on Polish Wikipedia by <a href="https://meta.wikimedia.org/wiki/User:Nadzik" target="_blank" rel="noopener">User:Nadzik</a>',
-    'header.subtitle':     'Biographies on Polish Wikipedia',
+    'header.subtitle':     '365 days · one biography from every country in the world',
 
     'stats.articles':      'Articles',
     'stats.countries':     'Countries',
@@ -12,12 +12,25 @@ const TRANSLATIONS = {
     'stats.cw':            'Did You Know',
     'stats.da':            'Good Article',
     'stats.anm':           'Featured',
+    'stats.firstWomen':    'First women',
+    'stats.firstWomenTitle': 'Women who were the first in their country to hold their role — click to filter',
 
     'map.colorByArticles': 'By articles',
     'map.colorByAwards':   'By awards',
     'map.additionalNote':  'Some disputed territories are listed separately.',
     'map.showAll':         'Show all →',
     'legend.none':         '0',
+    'legend.articles':     'articles / country',
+    'legend.awards':       'awards / country',
+
+    'replay.label':        'Replay the year',
+    'replay.play':         'Replay the year',
+    'replay.pause':        'Pause',
+    'replay.day':          'day',
+    'replay.articles':     'articles',
+    'replay.countries':    'countries',
+
+    'filters.firstWomen':  'First woman in role',
 
     'panel.noCountry':         'Click a country to see articles',
     'panel.countriesTitle':    'Countries by articles',
@@ -78,7 +91,7 @@ const TRANSLATIONS = {
   pl: {
     'header.title':        'Kobiety w polityce — Wikipedia',
     'header.titleHtml':    'Kobiety w polityce na polskojęzycznej Wikipedii by <a href="https://pl.wikipedia.org/wiki/Wikipedysta:Nadzik" target="_blank" rel="noopener">Wikipedysta:Nadzik</a>',
-    'header.subtitle':     'Biogramy na polskiej Wikipedii',
+    'header.subtitle':     '365 dni · jeden biogram z każdego kraju świata',
 
     'stats.articles':      'Artykuły',
     'stats.countries':     'Państwa',
@@ -86,12 +99,25 @@ const TRANSLATIONS = {
     'stats.cw':            'Czy wiesz',
     'stats.da':            'Dobry artykuł',
     'stats.anm':           'Artykuł na medal',
+    'stats.firstWomen':    'Pierwsze kobiety',
+    'stats.firstWomenTitle': 'Kobiety, które jako pierwsze w swoim kraju pełniły daną funkcję — kliknij, by filtrować',
 
     'map.colorByArticles': 'Wg artykułów',
     'map.colorByAwards':   'Wg wyróżnień',
     'map.additionalNote':  'Niektóre sporne terytoria są wylistowane oddzielnie.',
     'map.showAll':         'Pokaż wszystkie →',
     'legend.none':         '0',
+    'legend.articles':     'artykuły / kraj',
+    'legend.awards':       'wyróżnienia / kraj',
+
+    'replay.label':        'Odtwórz rok',
+    'replay.play':         'Odtwórz rok',
+    'replay.pause':        'Pauza',
+    'replay.day':          'dzień',
+    'replay.articles':     'artykułów',
+    'replay.countries':    'państw',
+
+    'filters.firstWomen':  'Pierwsza kobieta na stanowisku',
 
     'panel.noCountry':         'Kliknij kraj, by zobaczyć artykuły',
     'panel.countriesTitle':    'Państwa wg artykułów',
@@ -176,6 +202,9 @@ export function applyToDOM() {
   });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     el.placeholder = t(el.dataset.i18nPlaceholder);
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    el.title = t(el.dataset.i18nTitle);
   });
   document.title = t('header.title');
 }
