@@ -1,19 +1,20 @@
 // replay.js — "Replay the year" animation.
-// Sweeps the existing as-of-date filter from the first article to the last,
-// so the audience watches the world map fill in, with a live day/article/country
-// counter. Reuses applyFilters()'s asOfDate machinery — no new filtering logic.
-import { state, onFilterChange } from './app.js?v=14';
-import { t } from './i18n.js?v=14';
+// Sweeps the existing as-of-date filter one calendar day at a time, so the
+// audience watches the world map fill in day by day, with a live
+// day/article/country counter. Reuses applyFilters()'s asOfDate machinery.
+import { state, onReplayFrame, onFilterChange } from './app.js?v=15';
+import { t } from './i18n.js?v=15';
 
-const DAY_MS        = 86_400_000;
-const FRAME_COUNT   = 80;          // animation steps between start and last date
-const FRAME_MS      = 130;         // wall-clock per step (~10s total)
-const HOLD_MS       = 1800;        // keep the final overlay up briefly before hiding
-const PROJECT_START = '2025-03-21';// "365 in 365 days" began here; skip sparse pre-history
+const DAY_MS           = 86_400_000;
+const TARGET_MS        = 20_000;    // ~20s for the whole year at 1× speed
+const MIN_FRAME_MS     = 16;        // cap frame rate at ~60fps
+const HOLD_MS          = 1800;      // keep the final overlay up briefly before hiding
+const PROJECT_START    = '2025-03-21'; // "365 in 365 days" began here; skip sparse pre-history
 
 let _data       = null;
-let _frameDates = [];   // evenly spaced date checkpoints, 'YYYY-MM-DD'
+let _frameDates = [];   // one entry per calendar day, 'YYYY-MM-DD'
 let _minDate    = null;
+let _frameMs    = 40;   // base wall-clock per day, derived from TARGET_MS / #days
 let _timer      = null;
 let _idx        = 0;
 let _playing    = false;
@@ -27,7 +28,9 @@ export function init(data) {
   // Start at the project kick-off; any earlier articles count as baseline at day 1.
   _minDate = created[0] < PROJECT_START ? PROJECT_START : created[0];
   if (_minDate >= last) _minDate = created[0];   // safety fallback
-  _frameDates = buildFrames(_minDate, last, FRAME_COUNT);
+  _frameDates = buildDailyFrames(_minDate, last);
+  // Pace the whole year to ~TARGET_MS, but never faster than MIN_FRAME_MS/day.
+  _frameMs = Math.max(MIN_FRAME_MS, Math.round(TARGET_MS / _frameDates.length));
   document.getElementById('btn-replay')?.addEventListener('click', toggle);
   document.querySelectorAll('#replay-speed .speed-btn').forEach(btn => {
     btn.addEventListener('click', () => setSpeed(parseFloat(btn.dataset.speed)));
@@ -42,7 +45,7 @@ function setSpeed(s) {
   });
   if (_playing) {
     clearInterval(_timer);
-    _timer = setInterval(step, FRAME_MS / _speed);
+    _timer = setInterval(step, _frameMs / _speed);
   }
 }
 
@@ -60,11 +63,11 @@ function isoDate(ms) {
   return new Date(ms).toISOString().slice(0, 10);
 }
 
-function buildFrames(min, max, n) {
+function buildDailyFrames(min, max) {
   const d0 = Date.parse(min), d1 = Date.parse(max);
   const frames = [];
-  for (let i = 0; i <= n; i++) frames.push(isoDate(d0 + (d1 - d0) * (i / n)));
-  frames[frames.length - 1] = max;   // land exactly on the last date
+  for (let t = d0; t <= d1; t += DAY_MS) frames.push(isoDate(t));
+  if (frames[frames.length - 1] !== max) frames.push(max);   // land exactly on the last date
   return frames;
 }
 
@@ -81,7 +84,7 @@ function play() {
   if (_idx >= _frameDates.length) _idx = 0;   // restart when finished
   document.getElementById('replay-overlay')?.removeAttribute('hidden');
   step();                                      // render the first frame immediately
-  _timer = setInterval(step, FRAME_MS / _speed);
+  _timer = setInterval(step, _frameMs / _speed);
 }
 
 function pause() {
@@ -89,14 +92,17 @@ function pause() {
   _timer = null;
   _playing = false;
   setButton(false);
+  // Settle the full UI (panel list, filter counts, date input) to the paused day,
+  // since per-frame updates only touched the map + stats for smoothness.
+  syncDateInput(state.activeFilters.asOfDate);
+  onFilterChange();
 }
 
 function step() {
   if (_idx >= _frameDates.length) { finish(); return; }
   const date = _frameDates[_idx];
   state.activeFilters.asOfDate = date;
-  syncDateInput(date);
-  onFilterChange();
+  onReplayFrame();          // lightweight: map + stats only, so day-by-day stays smooth
   updateOverlay(date);
   _idx++;
 }

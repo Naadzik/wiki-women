@@ -1,5 +1,5 @@
 // timeline.js — Chart.js cumulative timelines (CW awards + articles created)
-import { t } from './i18n.js?v=14';
+import { t } from './i18n.js?v=15';
 
 // ── Theme helpers ─────────────────────────────────────────────────────────────
 
