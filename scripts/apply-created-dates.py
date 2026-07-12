@@ -41,6 +41,19 @@ TRANSLIT = {
     'Samiha Khalil':              'Samiha Chalil',
 }
 
+# Manually confirmed dates (looked up by the maintainer). Some articles were
+# moved to a Polish transliteration; the date is the original creation date.
+MANUAL = {
+    'Nancy Pelosi':                 '2019-11-22',
+    'Jeanine Áñez':                 '2019-11-19',
+    'Rawya Ateya':                  '2025-10-08',  # now: Rawija Atijja
+    'Lateefa Al Gaood':             '2025-10-13',  # now: Latifa al-Ka’ud
+    'Hind Abdul Rahman al-Muftah':  '2025-08-23',  # now: Hind al-Muftah
+    'Blaise Metreweli':             '2025-06-20',
+    # 'Aleksandra Kot' intentionally left null — the Skoczilenko match was a
+    # false positive (confirmed a different person); date still unknown.
+}
+
 def norm(s):
     if not s: return ''
     s = unicodedata.normalize('NFKD', s)
@@ -79,6 +92,9 @@ for c in data['countries'] + data['unrecognized']:
     for a in c['articles']:
         if a['title'] in resolved: continue
         if a.get('created') is not None: continue  # never overwrite
+        if a['title'] in MANUAL:
+            resolved[a['title']] = (MANUAL[a['title']], 'manual')
+            continue
         dk = (a['draftPath'].split(':', 1)[1] if a.get('draftPath') and ':' in a['draftPath'] else a.get('draftPath'))
         d, method = date_for(a['title'], bool(a.get('isDraft')), dk)
         if d:

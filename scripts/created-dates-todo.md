@@ -29,24 +29,22 @@ match missed them; the date comes from the moved article (same person).
 | Nizoramoh Zarifowa | Nizoramo Zaripowa | 2025-08-25 |
 | Samiha Khalil | Samiha Chalil | 2025-10-07 |
 
-## 🔎 Hunt down by hand — still null (7)
+## ✅ Resolved by hand (maintainer lookup)
 
-**Not created by Nadzik** — they pre-existed or were started by other editors,
-so the *by-creator* query can't see them. Run `scripts/quarry-created-dates-bytitle.sql`
-(matches by title, any creator) to get their real first-revision date:
+Pre-existing / moved articles the by-creator query couldn't see, now applied:
 
-- [ ] Nancy Pelosi
-- [ ] Jeanine Áñez
-- [ ] Rawya Ateya
-- [ ] Lateefa Al Gaood
-- [ ] Hind Abdul Rahman al-Muftah
-- [ ] Blaise Metreweli
+- [x] Nancy Pelosi — 2019-11-22
+- [x] Jeanine Áñez — 2019-11-19
+- [x] Rawya Ateya (now *Rawija Atijja*) — 2025-10-08
+- [x] Lateefa Al Gaood (now *Latifa al-Ka’ud*) — 2025-10-13
+- [x] Hind Abdul Rahman al-Muftah (now *Hind al-Muftah*) — 2025-08-23
+- [x] Blaise Metreweli — 2025-06-20
 
-**Bad fuzzy match — do NOT trust the guess:**
+## 🔎 Still null (1)
 
-- [ ] Aleksandra Kot — fuzzy-matched to *Aleksandra Skoczilenko* (2025-05-24),
-      but that is a different person (an anti-war artist). Find the real article
-      title manually.
+- [ ] **Aleksandra Kot** — the earlier fuzzy match to *Aleksandra Skoczilenko*
+      was confirmed to be a **different person**, so no date yet. Needs the real
+      article located manually.
 
-_Note: `Emma Macdonald` did not match either but already had a date
+_Note: `Emma Macdonald` did not match the query but already had a date
 (2026-01-28), so it was left as-is._
