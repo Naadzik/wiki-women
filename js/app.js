@@ -1,12 +1,12 @@
 // app.js — entry point, global state, pub/sub wiring
-import * as i18n   from './i18n.js?v=14';
-import * as stats  from './stats.js?v=14';
-import * as filters from './filters.js?v=14';
-import * as search  from './search.js?v=14';
-import * as map     from './map.js?v=14';
-import * as panel   from './panel.js?v=14';
-import * as timeline from './timeline.js?v=14';
-import * as replay   from './replay.js?v=14';
+import * as i18n   from './i18n.js?v=15';
+import * as stats  from './stats.js?v=15';
+import * as filters from './filters.js?v=15';
+import * as search  from './search.js?v=15';
+import * as map     from './map.js?v=15';
+import * as panel   from './panel.js?v=15';
+import * as timeline from './timeline.js?v=15';
+import * as replay   from './replay.js?v=15';
 
 // ── Continent definitions ─────────────────────────────────────────────────────
 
@@ -200,6 +200,19 @@ export function onFilterChange() {
   }
   filters.updateCounts(filtered);
   timeline.update(filtered);
+}
+
+/**
+ * Lightweight per-frame update for the replay animation. Updates only the map
+ * and header stats — skips the expensive country-list rebuild and filter-count
+ * work — so day-by-day playback (hundreds of frames) stays smooth. The full
+ * onFilterChange() is called once when the animation ends.
+ */
+export function onReplayFrame() {
+  if (!_data) return;
+  const filtered = applyFilters(_data);
+  map.update(filtered);
+  stats.update(filtered, _data.meta);
 }
 
 /** Push current panel state onto the history stack and sync the back button. */
