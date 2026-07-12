@@ -216,21 +216,33 @@ function isDark() {
 const ARTICLES_DARK = d3.interpolateRgb('#17385c', '#7dc0ff');
 const AWARDS_DARK    = d3.interpolateRgb('#5c3410', '#ffab5e');
 
+// Cap the colour scale so a single high outlier (e.g. one country with 21) does
+// not compress the low end, where most countries sit (1–9). Anything ≥ cap gets
+// the darkest colour; the legend shows "10+". Set to Infinity to revert.
+const COLOR_SCALE_CAP = 10;
+
+/** Effective scale maximum: the data max, but never above the cap. */
+function scaleMax(dataMax) {
+  return Math.min(Math.max(dataMax, 1), COLOR_SCALE_CAP);
+}
+
 function articlesColor(count) {
   if (!count) return 'var(--map-no-data)';
+  const eff = scaleMax(_maxArticles);
   const scale = d3.scaleSequentialSqrt()
-    .domain([0, Math.max(_maxArticles, 1)])
+    .domain([0, eff])
     .interpolator(isDark() ? ARTICLES_DARK : d3.interpolateBlues);
-  // Ensure count=1 is always visible (floor at 8% of the scale)
-  return scale(Math.max(count, _maxArticles * 0.08));
+  // Floor at 8% for visibility; clamp at the cap so 10+ all read as the max colour.
+  return scale(Math.min(Math.max(count, eff * 0.08), eff));
 }
 
 function awardsColor(count) {
   if (!count) return 'var(--map-no-data)';
+  const eff = scaleMax(_maxAwards);
   const scale = d3.scaleSequentialSqrt()
-    .domain([0, Math.max(_maxAwards, 1)])
+    .domain([0, eff])
     .interpolator(isDark() ? AWARDS_DARK : d3.interpolateOranges);
-  return scale(Math.max(count, _maxAwards * 0.08));
+  return scale(Math.min(Math.max(count, eff * 0.08), eff));
 }
 
 /** Colour for a data key (iso3/namePolish) using the current colour mode. */
@@ -263,7 +275,8 @@ function getCountryStats(iso3) {
 function updateLegend() {
   const awards = state.colorMode === 'awards';
   const maxVal = awards ? _maxAwards : _maxArticles;
-  document.getElementById('legend-max').textContent = maxVal;
+  document.getElementById('legend-max').textContent =
+    maxVal > COLOR_SCALE_CAP ? COLOR_SCALE_CAP + '+' : maxVal;
 
   const title = document.getElementById('legend-title');
   if (title) title.textContent = t(awards ? 'legend.awards' : 'legend.articles');
