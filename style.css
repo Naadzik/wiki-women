@@ -381,25 +381,23 @@ html.dark #legend-gradient {
 .replay-btn:hover { background: var(--accent); color: #fff; }
 .replay-btn.playing { background: var(--accent); color: #fff; }
 
+/* In-flow banner above the map (between the controls and the continent bar)
+   so it never covers the map while the year animation plays. */
 #replay-overlay {
-  position: absolute;
-  top: 92px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 5;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
-  padding: 10px 22px;
+  justify-content: center;
+  gap: 4px 18px;
+  margin: 0 16px 8px;
+  padding: 6px 16px;
   border-radius: var(--radius);
   background: var(--tooltip-bg);
   color: var(--tooltip-text);
-  box-shadow: var(--shadow-lg);
   pointer-events: none;
 }
 #replay-overlay[hidden] { display: none; }
-#replay-date { font-size: 1.35rem; font-weight: 700; letter-spacing: 0.02em; }
+#replay-date { font-size: 1.05rem; font-weight: 700; letter-spacing: 0.02em; }
 #replay-counters {
   display: flex;
   gap: 16px;
