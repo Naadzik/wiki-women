@@ -40,11 +40,12 @@ Pre-existing / moved articles the by-creator query couldn't see, now applied:
 - [x] Hind Abdul Rahman al-Muftah (now *Hind al-Muftah*) — 2025-08-23
 - [x] Blaise Metreweli — 2025-06-20
 
-## 🔎 Still null (1)
+- [x] Aleksandra Kot — 2024-06-10 (confirmed distinct from A. Skoczilenko)
 
-- [ ] **Aleksandra Kot** — the earlier fuzzy match to *Aleksandra Skoczilenko*
-      was confirmed to be a **different person**, so no date yet. Needs the real
-      article located manually.
+## ✅ Complete
+
+All 455 articles now have a verified creation date — 0 remaining null.
+No existing date was changed during reconciliation.
 
 _Note: `Emma Macdonald` did not match the query but already had a date
 (2026-01-28), so it was left as-is._

@@ -50,8 +50,7 @@ MANUAL = {
     'Lateefa Al Gaood':             '2025-10-13',  # now: Latifa al-Ka’ud
     'Hind Abdul Rahman al-Muftah':  '2025-08-23',  # now: Hind al-Muftah
     'Blaise Metreweli':             '2025-06-20',
-    # 'Aleksandra Kot' intentionally left null — the Skoczilenko match was a
-    # false positive (confirmed a different person); date still unknown.
+    'Aleksandra Kot':               '2024-06-10',  # confirmed distinct from A. Skoczilenko
 }
 
 def norm(s):
