@@ -1212,27 +1212,25 @@ html.dark #legend-gradient {
     width: 150px;
   }
 
-  /* Stats: a wrapping grid so all seven fit without labels overlapping.
-     Dividers are hidden and labels are allowed to wrap onto two lines. */
+  /* Stats: a single horizontal line; swipe sideways to see the rest.
+     Items size to their content so labels never overlap or wrap. */
   #stats-bar {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px 2px;
-    overflow-x: visible;
-    padding-bottom: 12px;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0;
+    padding-bottom: 10px;
   }
-  .stat-divider { display: none; }
   .stat-item {
-    min-width: 0;
-    padding: 4px 2px;
+    flex: 0 0 auto;
+    min-width: auto;
+    padding: 0 12px;
   }
-  .stat-value { font-size: 1.15rem; }
-  .stat-label {
-    font-size: 0.6rem;
-    white-space: normal;
-    line-height: 1.2;
-    letter-spacing: 0.02em;
-  }
+  .stat-value { font-size: 1.1rem; }
+  .stat-label { font-size: 0.62rem; white-space: nowrap; }
+
+  /* Hide the tagline on mobile to save vertical space */
+  #header-subtitle { display: none; }
 }
 
 @media (max-width: 480px) {
