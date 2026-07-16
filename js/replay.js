@@ -2,8 +2,8 @@
 // Sweeps the existing as-of-date filter one calendar day at a time, so the
 // audience watches the world map fill in day by day, with a live
 // day/article/country counter. Reuses applyFilters()'s asOfDate machinery.
-import { state, onReplayFrame, onFilterChange } from './app.js?v=15';
-import { t } from './i18n.js?v=15';
+import { state, onReplayFrame, onFilterChange } from './app.js?v=16';
+import { t } from './i18n.js?v=16';
 
 const DAY_MS           = 86_400_000;
 const TARGET_MS        = 20_000;    // ~20s for the whole year at 1× speed
@@ -81,6 +81,9 @@ function play() {
   if (!_frameDates.length) return;
   _playing = true;
   setButton(true);
+  // Hide the continent bar while playing so the countdown banner takes its slot
+  // instead of adding height and pushing the map off-screen.
+  document.body.classList.add('replaying');
   if (_idx >= _frameDates.length) _idx = 0;   // restart when finished
   document.getElementById('replay-overlay')?.removeAttribute('hidden');
   step();                                      // render the first frame immediately
@@ -92,6 +95,10 @@ function pause() {
   _timer = null;
   _playing = false;
   setButton(false);
+  // Return to the normal layout at the paused day: hide the banner and bring the
+  // continent bar back. The header stats + date input already show the state.
+  document.getElementById('replay-overlay')?.setAttribute('hidden', '');
+  document.body.classList.remove('replaying');
   // Settle the full UI (panel list, filter counts, date input) to the paused day,
   // since per-frame updates only touched the map + stats for smoothness.
   syncDateInput(state.activeFilters.asOfDate);
@@ -116,7 +123,12 @@ function finish() {
   state.activeFilters.asOfDate = null;
   syncDateInput(null);
   onFilterChange();
-  setTimeout(() => document.getElementById('replay-overlay')?.setAttribute('hidden', ''), HOLD_MS);
+  // Keep the continent bar hidden until the banner fades, so the two swap
+  // together and the map never gets pushed during the final hold.
+  setTimeout(() => {
+    document.getElementById('replay-overlay')?.setAttribute('hidden', '');
+    document.body.classList.remove('replaying');
+  }, HOLD_MS);
 }
 
 // ── Overlay + counters ────────────────────────────────────────────────────────
@@ -124,9 +136,15 @@ function finish() {
 function updateOverlay(date) {
   const dayNum = Math.round((Date.parse(date) - Date.parse(_minDate)) / DAY_MS) + 1;
 
-  // Match the map's asOfDate rule exactly (applyFilters keeps articles with no
-  // created date always), so the counter never disagrees with what's on screen.
-  const present = (a) => !a.created || a.created <= date;
+  // Match the map's asOfDate rule exactly so the counter never disagrees with
+  // what's on screen. In "By awards" colour mode the map only colours awarded
+  // countries, so count only articles that are awarded by this date; otherwise
+  // count every article that exists by this date (null created = always present).
+  const awardsMode = state.colorMode === 'awards';
+  const createdBy = (a) => !a.created || a.created <= date;
+  const present = awardsMode
+    ? (a) => createdBy(a) && a.awards.some(aw => !aw.date || aw.date <= date)
+    : createdBy;
 
   // When a continent is selected, the map is scoped to it — scope the counters
   // to match (same rule applyFilters uses: keep only countries in the iso3 set).
@@ -156,6 +174,7 @@ function updateOverlay(date) {
   setText('replay-day', dayNum);
   setText('replay-articles', titles.size);
   setText('replay-countries', countries);
+  setText('replay-count-label', t(awardsMode ? 'replay.awarded' : 'replay.articles'));
 }
 
 // ── DOM helpers ───────────────────────────────────────────────────────────────

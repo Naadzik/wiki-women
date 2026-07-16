@@ -1,6 +1,6 @@
 // panel.js — country side panel
-import { findCountry, findCountryRaw, onCountryClick, onAwardDateClick } from './app.js?v=15';
-import { t, getLang } from './i18n.js?v=15';
+import { findCountry, findCountryRaw, onCountryClick, onAwardDateClick } from './app.js?v=16';
+import { t, getLang } from './i18n.js?v=16';
 
 const WIKI_BASE = 'https://pl.wikipedia.org/wiki/';
 

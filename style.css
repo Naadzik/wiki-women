@@ -388,15 +388,21 @@ html.dark #legend-gradient {
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 4px 18px;
-  margin: 0 16px 8px;
-  padding: 6px 16px;
-  border-radius: var(--radius);
+  gap: 2px 18px;
+  /* Match the ~32px footprint of the continent bar it replaces, so the map
+     doesn't move when the animation starts. */
+  margin: 0 16px 0;
+  padding: 4px 16px;
+  border-radius: var(--radius-sm);
   background: var(--tooltip-bg);
   color: var(--tooltip-text);
   pointer-events: none;
 }
 #replay-overlay[hidden] { display: none; }
+
+/* While the animation plays, hide the continent bar so the countdown banner
+   takes its slot instead of adding height and pushing the map off-screen. */
+body.replaying #continent-bar { display: none; }
 #replay-date { font-size: 1.05rem; font-weight: 700; letter-spacing: 0.02em; }
 #replay-counters {
   display: flex;

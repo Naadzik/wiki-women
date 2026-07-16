@@ -1,6 +1,6 @@
 // filters.js — editorial-action filter buttons + clear all
-import { state, onFilterChange } from './app.js?v=15';
-import { t } from './i18n.js?v=15';
+import { state, onFilterChange } from './app.js?v=16';
+import { t } from './i18n.js?v=16';
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let _rawData = null;
