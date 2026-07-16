@@ -29,6 +29,7 @@ const TRANSLATIONS = {
     'replay.speed':        'Animation speed',
     'replay.day':          'day',
     'replay.articles':     'articles',
+    'replay.awarded':      'awarded',
     'replay.countries':    'countries',
 
     'filters.firstWomen':  'First woman in role',
@@ -117,6 +118,7 @@ const TRANSLATIONS = {
     'replay.speed':        'Prędkość animacji',
     'replay.day':          'dzień',
     'replay.articles':     'artykułów',
+    'replay.awarded':      'wyróżnionych',
     'replay.countries':    'państw',
 
     'filters.firstWomen':  'Pierwsza kobieta na stanowisku',

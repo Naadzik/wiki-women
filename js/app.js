@@ -1,12 +1,12 @@
 // app.js — entry point, global state, pub/sub wiring
-import * as i18n   from './i18n.js?v=15';
-import * as stats  from './stats.js?v=15';
-import * as filters from './filters.js?v=15';
-import * as search  from './search.js?v=15';
-import * as map     from './map.js?v=15';
-import * as panel   from './panel.js?v=15';
-import * as timeline from './timeline.js?v=15';
-import * as replay   from './replay.js?v=15';
+import * as i18n   from './i18n.js?v=16';
+import * as stats  from './stats.js?v=16';
+import * as filters from './filters.js?v=16';
+import * as search  from './search.js?v=16';
+import * as map     from './map.js?v=16';
+import * as panel   from './panel.js?v=16';
+import * as timeline from './timeline.js?v=16';
+import * as replay   from './replay.js?v=16';
 
 // ── Continent definitions ─────────────────────────────────────────────────────
 
