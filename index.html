@@ -431,17 +431,19 @@
   // Live stats from the same data file the app uses — never goes stale.
   fetch('data/wikiwomen.json').then(r => r.json()).then(data => {
     const titles = new Set();
-    let cw = 0, da = 0, anm = 0, firstWomen = 0;
+    const fwTitles = new Set();   // isFirstWoman is country-relative: count if flagged in ANY country
+    let cw = 0, da = 0, anm = 0;
     for (const c of [...data.countries, ...data.unrecognized]) {
       for (const a of c.articles) {
+        if (a.isFirstWoman) fwTitles.add(a.title);
         if (titles.has(a.title)) continue;
         titles.add(a.title);
         for (const w of a.awards) {
           if (w.type === 'cw') cw++; else if (w.type === 'da') da++; else if (w.type === 'anm') anm++;
         }
-        if (a.isFirstWoman) firstWomen++;
       }
     }
+    const firstWomen = fwTitles.size;
     const covered = data.countries.filter(c => c.articles.length > 0).length;
     const coverage = Math.round((covered / 193) * 100);
 
