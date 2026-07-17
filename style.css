@@ -379,27 +379,33 @@ button {
 .replay-btn.playing { background: var(--accent); color: #fff; }
 
 /* In-flow banner above the map (between the controls and the continent bar)
-   so it never covers the map while the year animation plays. */
+   so it never covers the map while the year animation plays. Two rows: the
+   date/counters, then the scrubber. Replaces the continent bar's slot while
+   active so starting the animation doesn't push the map down. */
 #replay-overlay {
+  position: relative;   /* anchor for the close button */
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 2px 18px;
-  /* Match the ~32px footprint of the continent bar it replaces, so the map
-     doesn't move when the animation starts. */
+  flex-direction: column;
+  gap: 4px;
   margin: 0 16px 0;
-  padding: 4px 16px;
+  padding: 5px 30px 7px 16px;
   border-radius: var(--radius-sm);
   background: var(--tooltip-bg);
   color: var(--tooltip-text);
-  pointer-events: none;
 }
 #replay-overlay[hidden] { display: none; }
 
 /* While the animation plays, hide the continent bar so the countdown banner
    takes its slot instead of adding height and pushing the map off-screen. */
 body.replaying #continent-bar { display: none; }
+
+#replay-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 2px 18px;
+}
 #replay-date { font-size: 1.05rem; font-weight: 700; letter-spacing: 0.02em; }
 #replay-counters {
   display: flex;
@@ -408,6 +414,48 @@ body.replaying #continent-bar { display: none; }
   opacity: 0.9;
 }
 #replay-counters b { font-size: 0.95rem; }
+
+#replay-close {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  padding: 4px 6px;
+  border: none;
+  background: none;
+  color: var(--tooltip-text);
+  opacity: 0.55;
+  font-size: 0.8rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+#replay-close:hover { opacity: 1; }
+
+/* ── Scrubber: drag the "ball" to jump to any day ── */
+#replay-scrubber {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.replay-scrub-label {
+  flex: 0 0 auto;
+  min-width: 58px;
+  font-size: 0.66rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+#replay-scrub-end { text-align: right; }
+
+#replay-slider {
+  flex: 1;
+  min-width: 0;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+html.dark #replay-slider { color-scheme: dark; }
 
 /* Continent filter bar */
 #continent-bar {
@@ -1299,6 +1347,8 @@ body.present .tooltip-country { font-size: 1.15rem; }
 
 body.present #replay-date { font-size: 1.8rem; }
 body.present #replay-counters { font-size: 1rem; }
+body.present .replay-scrub-label { font-size: 0.85rem; min-width: 80px; }
+body.present #replay-slider { height: 24px; }
 
 body.present #panel-country-name { font-size: 1.4rem; }
 body.present .article-item { font-size: 1.05rem; }

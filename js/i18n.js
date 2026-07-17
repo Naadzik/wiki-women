@@ -28,6 +28,8 @@ const TRANSLATIONS = {
     'replay.pause':        'Pause',
     'replay.speed':        'Animation speed',
     'replay.day':          'day',
+    'replay.close':        'Close',
+    'replay.scrub':        'Drag to a specific day',
 
     'count.article.one':   'article',
     'count.article.other': 'articles',
@@ -119,6 +121,8 @@ const TRANSLATIONS = {
     'replay.pause':        'Pauza',
     'replay.speed':        'Prędkość animacji',
     'replay.day':          'dzień',
+    'replay.close':        'Zamknij',
+    'replay.scrub':        'Przeciągnij, aby przejść do wybranego dnia',
 
     'count.article.one':   'artykuł',
     'count.article.few':   'artykuły',

@@ -1,10 +1,10 @@
 // map.js — D3 choropleth world map
-import { state, onCountryClick, buildCountryMap } from './app.js?v=17';
-import { t, getLang } from './i18n.js?v=17';
-import { isDark, countAwardTypes } from './utils.js?v=17';
+import { state, onCountryClick, buildCountryMap } from './app.js?v=18';
+import { t, getLang } from './i18n.js?v=18';
+import { isDark, countAwardTypes } from './utils.js?v=18';
 
 // Vendored locally (was cdn.jsdelivr.net/npm/world-atlas@2) so the map loads offline.
-const WORLD_ATLAS_URL = 'data/countries-110m.json?v=17';
+const WORLD_ATLAS_URL = 'data/countries-110m.json?v=18';
 
 // ── ISO numeric → alpha-3 lookup ─────────────────────────────────────────────
 // Source: ISO 3166-1 (entries covering the dataset), sorted by numeric code.
