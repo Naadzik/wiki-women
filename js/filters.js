@@ -1,6 +1,7 @@
 // filters.js — editorial-action filter buttons + clear all
-import { state, onFilterChange } from './app.js?v=16';
-import { t } from './i18n.js?v=16';
+import { state, onFilterChange } from './app.js?v=17';
+import { t } from './i18n.js?v=17';
+import { uniqueByTitle, countFirstWomen } from './utils.js?v=17';
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let _rawData = null;
@@ -173,7 +174,8 @@ function toggleNoAwards() {
   onFilterChange();
 }
 
-function toggleFirstWomen() {
+/** Exported so the header stat chip can drive the same filter. */
+export function toggleFirstWomen() {
   state.activeFilters.firstWomen = !state.activeFilters.firstWomen;
   syncActiveStates();
   onFilterChange();
@@ -217,22 +219,17 @@ function syncActiveStates() {
 export function updateCounts(filteredData) {
   if (!_rawData) return;
 
-  const allRaw = [
+  const flatRaw = [
     ..._rawData.countries.flatMap(c => c.articles),
     ..._rawData.unrecognized.flatMap(c => c.articles),
   ];
-  const allFiltered = [
+  const flatFiltered = [
     ...filteredData.countries.flatMap(c => c.articles),
     ...filteredData.unrecognized.flatMap(c => c.articles),
   ];
-
-  // Deduplicate by title — same article may appear in multiple countries
-  const seenTitles = new Set();
-  const uniqueFiltered = allFiltered.filter(a => {
-    if (seenTitles.has(a.title)) return false;
-    seenTitles.add(a.title);
-    return true;
-  });
+  // Deduplicate by title — the same article may appear in multiple countries
+  const uniqueRaw = uniqueByTitle(flatRaw);
+  const uniqueFiltered = uniqueByTitle(flatFiltered);
 
   // Per-action counts: unique filtered articles with this action
   document.querySelectorAll('[data-action-count]').forEach(el => {
@@ -254,13 +251,15 @@ export function updateCounts(filteredData) {
     countEl.textContent = count > 0 ? `(${count})` : '';
   });
 
-  // No-awards count: articles with zero awards in raw data (not filter-dependent)
-  const noAwardsCount = allRaw.filter(a => a.awards.length === 0).length;
+  // No-awards count: unique articles with zero awards in raw data
+  // (not filter-dependent; deduped so shared articles aren't counted twice)
+  const noAwardsCount = uniqueRaw.filter(a => a.awards.length === 0).length;
   const noAwardsCountEl = document.getElementById('btn-no-awards')?.querySelector('.filter-count');
   if (noAwardsCountEl) noAwardsCountEl.textContent = noAwardsCount > 0 ? `(${noAwardsCount})` : '';
 
-  // First-woman count among currently filtered unique articles
-  const firstWomenCount = uniqueFiltered.filter(a => a.isFirstWoman).length;
+  // First-woman count among currently filtered articles. Counted on the flat
+  // list because the flag is country-relative (see utils.countFirstWomen).
+  const firstWomenCount = countFirstWomen(flatFiltered);
   const firstWomenCountEl = document.getElementById('btn-first-women')?.querySelector('.filter-count');
   if (firstWomenCountEl) firstWomenCountEl.textContent = firstWomenCount > 0 ? `(${firstWomenCount})` : '';
 }

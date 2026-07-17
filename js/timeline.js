@@ -1,11 +1,8 @@
 // timeline.js — Chart.js cumulative timelines (CW awards + articles created)
-import { t } from './i18n.js?v=16';
+import { t } from './i18n.js?v=17';
+import { isDark, PROJECT_START } from './utils.js?v=17';
 
 // ── Theme helpers ─────────────────────────────────────────────────────────────
-
-function isDark() {
-  return document.documentElement.classList.contains('dark');
-}
 
 function colors(accent) {
   const dark = isDark();
@@ -26,7 +23,7 @@ const ACCENT_CREATED = {
   dark:  '#3fcf7f', darkFill:  'rgba(63,207,127,0.15)',
 };
 
-const DEFAULT_FROM = '2025-03-21';
+const DEFAULT_FROM = PROJECT_START;  // charts default to the project kick-off
 
 // ── Generic chart instance factory ───────────────────────────────────────────
 

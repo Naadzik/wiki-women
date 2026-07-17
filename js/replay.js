@@ -2,20 +2,21 @@
 // Sweeps the existing as-of-date filter one calendar day at a time, so the
 // audience watches the world map fill in day by day, with a live
 // day/article/country counter. Reuses applyFilters()'s asOfDate machinery.
-import { state, onReplayFrame, onFilterChange } from './app.js?v=16';
-import { t } from './i18n.js?v=16';
+import { state, onReplayFrame, onFilterChange } from './app.js?v=17';
+import { t, tPlural } from './i18n.js?v=17';
+import { PROJECT_START, setText } from './utils.js?v=17';
 
-const DAY_MS           = 86_400_000;
-const TARGET_MS        = 20_000;    // ~20s for the whole year at 1× speed
-const MIN_FRAME_MS     = 16;        // cap frame rate at ~60fps
-const HOLD_MS          = 1800;      // keep the final overlay up briefly before hiding
-const PROJECT_START    = '2025-03-21'; // "365 in 365 days" began here; skip sparse pre-history
+const DAY_MS       = 86_400_000;
+const TARGET_MS    = 20_000;    // ~20s for the whole year at 1× speed
+const MIN_FRAME_MS = 16;        // cap frame rate at ~60fps
+const HOLD_MS      = 1800;      // keep the final overlay up briefly before hiding
 
 let _data       = null;
 let _frameDates = [];   // one entry per calendar day, 'YYYY-MM-DD'
 let _minDate    = null;
 let _frameMs    = 40;   // base wall-clock per day, derived from TARGET_MS / #days
 let _timer      = null;
+let _endTimer   = null; // pending end-of-animation cleanup (cancelled on restart)
 let _idx        = 0;
 let _playing    = false;
 let _speed      = 1;    // playback multiplier: 0.5 = 2× slower, 2 = 2× faster
@@ -79,6 +80,10 @@ export function toggle() {
 
 function play() {
   if (!_frameDates.length) return;
+  // Restarting within the end-hold must cancel the pending cleanup, or it
+  // would fire mid-play and yank the banner/layout out from under us.
+  clearTimeout(_endTimer);
+  _endTimer = null;
   _playing = true;
   setButton(true);
   // Hide the continent bar while playing so the countdown banner takes its slot
@@ -125,9 +130,10 @@ function finish() {
   onFilterChange();
   // Keep the continent bar hidden until the banner fades, so the two swap
   // together and the map never gets pushed during the final hold.
-  setTimeout(() => {
+  _endTimer = setTimeout(() => {
     document.getElementById('replay-overlay')?.setAttribute('hidden', '');
     document.body.classList.remove('replaying');
+    _endTimer = null;
   }, HOLD_MS);
 }
 
@@ -174,7 +180,8 @@ function updateOverlay(date) {
   setText('replay-day', dayNum);
   setText('replay-articles', titles.size);
   setText('replay-countries', countries);
-  setText('replay-count-label', t(awardsMode ? 'replay.awarded' : 'replay.articles'));
+  setText('replay-count-label', tPlural(awardsMode ? 'count.awarded' : 'count.article', titles.size));
+  setText('replay-countries-label', tPlural('count.country', countries));
 }
 
 // ── DOM helpers ───────────────────────────────────────────────────────────────
@@ -203,7 +210,3 @@ function syncDateInput(date) {
   document.getElementById('filter-group-date')?.classList.toggle('active', !!date);
 }
 
-function setText(id, val) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = val;
-}

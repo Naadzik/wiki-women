@@ -1,12 +1,12 @@
 // app.js — entry point, global state, pub/sub wiring
-import * as i18n   from './i18n.js?v=16';
-import * as stats  from './stats.js?v=16';
-import * as filters from './filters.js?v=16';
-import * as search  from './search.js?v=16';
-import * as map     from './map.js?v=16';
-import * as panel   from './panel.js?v=16';
-import * as timeline from './timeline.js?v=16';
-import * as replay   from './replay.js?v=16';
+import * as i18n   from './i18n.js?v=17';
+import * as stats  from './stats.js?v=17';
+import * as filters from './filters.js?v=17';
+import * as search  from './search.js?v=17';
+import * as map     from './map.js?v=17';
+import * as panel   from './panel.js?v=17';
+import * as timeline from './timeline.js?v=17';
+import * as replay   from './replay.js?v=17';
 
 // ── Continent definitions ─────────────────────────────────────────────────────
 
@@ -215,6 +215,15 @@ export function onReplayFrame() {
   stats.update(filtered, _data.meta);
 }
 
+/** Reset the panel to the countries list, clearing selection and history. */
+function resetToList() {
+  state.selectedCountry = null;
+  state.panelMode = 'list';
+  state.navHistory = [];
+  syncBackButton();
+  map.deselectAll();
+}
+
 /** Push current panel state onto the history stack and sync the back button. */
 function pushHistory() {
   state.navHistory.push({
@@ -345,7 +354,9 @@ function onLangToggle() {
     if (state.panelMode === 'list') panel.showCountriesList(filtered, cKey ? i18n.t(`continents.${cKey}`) : null);
     else if (state.selectedCountry) panel.show(state.selectedCountry, filtered);
     timeline.updateLabels();
-    map.updateTooltipLang();
+    // Refreshes the legend title translation (it is set by JS, not data-i18n,
+    // because it depends on the active colour mode).
+    map.applyTheme();
   }
 }
 
@@ -450,31 +461,25 @@ async function boot() {
   document.getElementById('panel-close')?.addEventListener('click', onPanelClose);
   syncBackButton();
 
-  // Keyboard shortcut: P toggles presentation mode (ignored while typing)
+  // Keyboard shortcut: P toggles presentation mode (ignored while typing or
+  // when a modifier is held — Ctrl/Cmd+P must stay the browser's print).
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'p' && e.key !== 'P') return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
     const el = document.activeElement;
     if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) return;
     togglePresentMode();
   });
 
-  // First-women stat chip toggles the first-woman filter
+  // First-women stat chip mirrors the filter button (single source of truth)
   document.getElementById('stat-firstwomen-btn')?.addEventListener('click', () => {
     if (!_data) return;
-    state.activeFilters.firstWomen = !state.activeFilters.firstWomen;
-    document.getElementById('btn-first-women')?.classList.toggle('active', state.activeFilters.firstWomen);
-    onFilterChange();
+    filters.toggleFirstWomen();
   });
   document.getElementById('stat-countries-btn')?.addEventListener('click', () => {
     if (!_data) return;
-    state.selectedCountry = null;
-    state.panelMode = 'list';
-    state.navHistory = [];
-    syncBackButton();
-    map.deselectAll();
-    const cKey = activeContinentKey();
-    const filtered = applyFilters(_data);
-    panel.showCountriesList(filtered, cKey ? i18n.t(`continents.${cKey}`) : null);
+    resetToList();
+    onFilterChange();
   });
 
   // Load data
@@ -519,11 +524,7 @@ async function boot() {
         map.zoomToContinent(CONTINENT_BOUNDS[key]);
       }
       // Show countries list in panel (clear history — continent change resets context)
-      state.selectedCountry = null;
-      state.panelMode = 'list';
-      state.navHistory = [];
-      syncBackButton();
-      map.deselectAll();
+      resetToList();
       onFilterChange();
     });
   });

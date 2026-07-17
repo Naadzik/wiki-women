@@ -1,6 +1,7 @@
 // panel.js — country side panel
-import { findCountry, findCountryRaw, onCountryClick, onAwardDateClick } from './app.js?v=16';
-import { t, getLang } from './i18n.js?v=16';
+import { findCountry, findCountryRaw, onCountryClick, onAwardDateClick } from './app.js?v=17';
+import { t, tPlural, getLang } from './i18n.js?v=17';
+import { countAwardTypes } from './utils.js?v=17';
 
 const WIKI_BASE = 'https://pl.wikipedia.org/wiki/';
 
@@ -89,7 +90,7 @@ export function show(countryKey, filteredData) {
   renderAwardSummary(country ? country.articles : []);
 
   // Article list (filtered)
-  renderArticleList(country ? country.articles : [], false);
+  renderArticleList(country ? country.articles : []);
 
   // Unrecognized territories linked to this country (not applicable here;
   // shown only in showSpecialList)
@@ -159,7 +160,7 @@ export function showSpecialList(rawData) {
     heading.className = 'panel-section-heading';
     heading.textContent = getLang() === 'pl' ? country.namePolish : country.nameEnglish;
     _articlesList.appendChild(heading);
-    renderArticleList(country.articles, false, _articlesList);
+    renderArticleList(country.articles, _articlesList);
   }
 
   _unrecognizedNote.hidden = true;
@@ -168,9 +169,7 @@ export function showSpecialList(rawData) {
 // ── Renderers ─────────────────────────────────────────────────────────────────
 
 function renderAwardSummary(articles) {
-  const cw  = articles.flatMap(a => a.awards).filter(a => a.type === 'cw').length;
-  const da  = articles.flatMap(a => a.awards).filter(a => a.type === 'da').length;
-  const anm = articles.flatMap(a => a.awards).filter(a => a.type === 'anm').length;
+  const { cw, da, anm } = countAwardTypes(articles);
 
   const parts = [];
   if (cw)  parts.push(`<span class="badge-cw">${t('awards.cw')} ×${cw}</span>`);
@@ -178,13 +177,12 @@ function renderAwardSummary(articles) {
   if (anm) parts.push(`<span class="badge-anm">${t('awards.anm')} ×${anm}</span>`);
 
   const count = articles.length;
-  const countLabel = count === 1 ? t('panel.article') : t('panel.articles');
-  const countSpan = `<span class="panel-article-count">${count} ${countLabel}</span>`;
+  const countSpan = `<span class="panel-article-count">${count} ${tPlural('count.article', count)}</span>`;
 
   _awardSummary.innerHTML = countSpan + (parts.length ? ' ' + parts.join(' ') : '');
 }
 
-function renderArticleList(articles, _unused, container) {
+function renderArticleList(articles, container) {
   const target = container || _articlesList;
   if (!container) target.innerHTML = '';
 
@@ -229,23 +227,7 @@ function buildArticleItem(article) {
   // Meta row: badges + action tags
   const meta = document.createElement('div');
   meta.className = 'article-meta';
-
-  for (const award of article.awards) {
-    const badge = document.createElement('span');
-    badge.className = `badge-${award.type}`;
-    let label = t(`awards.${award.type}`);
-    if (award.date) {
-      label += ` ${formatDate(award.date)}`;
-      badge.classList.add('badge-clickable');
-      badge.title = award.date;
-      badge.addEventListener('click', (e) => {
-        e.preventDefault();
-        onAwardDateClick(award.type, award.date);
-      });
-    }
-    badge.textContent = label;
-    meta.appendChild(badge);
-  }
+  appendAwardBadges(meta, article, true);
 
   for (const action of article.editorialActions) {
     const tag = document.createElement('span');
@@ -257,20 +239,47 @@ function buildArticleItem(article) {
   if (meta.childElementCount > 0) item.appendChild(meta);
 
   // First-woman marker
-  if (article.isFirstWoman) {
-    const fw = document.createElement('div');
-    fw.className = 'first-woman-marker';
-    fw.textContent = t('panel.firstWoman');
-    item.appendChild(fw);
-  }
+  if (article.isFirstWoman) item.appendChild(firstWomanMarker());
 
   return item;
+}
+
+/**
+ * Append one badge per award to `container`. When `clickable`, a dated badge
+ * navigates to the shared award-date view on click.
+ */
+function appendAwardBadges(container, article, clickable) {
+  for (const award of article.awards) {
+    const badge = document.createElement('span');
+    badge.className = `badge-${award.type}`;
+    let label = t(`awards.${award.type}`);
+    if (award.date) {
+      label += ` ${award.date}`;
+      if (clickable) {
+        badge.classList.add('badge-clickable');
+        badge.title = award.date;
+        badge.addEventListener('click', (e) => {
+          e.preventDefault();
+          onAwardDateClick(award.type, award.date);
+        });
+      }
+    }
+    badge.textContent = label;
+    container.appendChild(badge);
+  }
+}
+
+function firstWomanMarker() {
+  const fw = document.createElement('div');
+  fw.className = 'first-woman-marker';
+  fw.textContent = t('panel.firstWoman');
+  return fw;
 }
 
 /** Show list of all articles sharing an award date across all countries. */
 export function showAwardDateList(awardType, date, entries) {
   _content.hidden = false;
-  _countryName.textContent = `${t(`awards.${awardType}`)} ${formatDate(date)}`;
+  _countryName.textContent = `${t(`awards.${awardType}`)} ${date}`;
   _unrecognizedNote.hidden = true;
   _articlesList.innerHTML = '';
 
@@ -284,7 +293,7 @@ export function showAwardDateList(awardType, date, entries) {
     }
   }
 
-  _awardSummary.innerHTML = `<span class="panel-article-count">${byTitle.size} ${byTitle.size === 1 ? t('panel.article') : t('panel.articles')}</span>`;
+  _awardSummary.innerHTML = `<span class="panel-article-count">${byTitle.size} ${tPlural('count.article', byTitle.size)}</span>`;
 
   for (const { article, countries } of byTitle.values()) {
     _articlesList.appendChild(buildAwardDateItem(article, countries));
@@ -321,23 +330,11 @@ function buildAwardDateItem(article, countries) {
 
   item.appendChild(titleRow);
 
-  // Also show other awards on this article (for context)
+  // Also show other awards on this article (for context; not clickable here)
   const meta = document.createElement('div');
   meta.className = 'article-meta';
-  for (const aw of article.awards) {
-    const badge = document.createElement('span');
-    badge.className = `badge-${aw.type}`;
-    let label = t(`awards.${aw.type}`);
-    if (aw.date) label += ` ${formatDate(aw.date)}`;
-    badge.textContent = label;
-    meta.appendChild(badge);
-  }
-  if (article.isFirstWoman) {
-    const fw = document.createElement('div');
-    fw.className = 'first-woman-marker';
-    fw.textContent = t('panel.firstWoman');
-    item.appendChild(fw);
-  }
+  appendAwardBadges(meta, article, false);
+  if (article.isFirstWoman) item.appendChild(firstWomanMarker());
   if (meta.childElementCount > 0) item.appendChild(meta);
 
   return item;
@@ -346,27 +343,28 @@ function buildAwardDateItem(article, countries) {
 // ── Countries list helpers ────────────────────────────────────────────────────
 
 function sortCountries(countries, sortBy = 'articles') {
-  return [...countries].sort((a, b) => {
-    const aCw = a.articles.flatMap(x => x.awards).filter(x => x.type === 'cw').length;
-    const bCw = b.articles.flatMap(x => x.awards).filter(x => x.type === 'cw').length;
+  const lang = getLang();
+  // Precompute counts once per country (not once per comparison)
+  const decorated = countries.map(c => {
+    const { cw, da, anm } = countAwardTypes(c.articles);
+    return { c, cw, other: da + anm, name: lang === 'pl' ? c.namePolish : c.nameEnglish };
+  });
 
+  decorated.sort((a, b) => {
     if (sortBy === 'cw') {
-      if (aCw !== bCw) return bCw - aCw;
-      const diff = b.articles.length - a.articles.length;
+      if (a.cw !== b.cw) return b.cw - a.cw;
+      const diff = b.c.articles.length - a.c.articles.length;
       if (diff !== 0) return diff;
     } else {
-      const diff = b.articles.length - a.articles.length;
+      const diff = b.c.articles.length - a.c.articles.length;
       if (diff !== 0) return diff;
-      if (aCw !== bCw) return bCw - aCw;
-      const aOther = a.articles.flatMap(x => x.awards).filter(x => x.type !== 'cw').length;
-      const bOther = b.articles.flatMap(x => x.awards).filter(x => x.type !== 'cw').length;
-      if (aOther !== bOther) return bOther - aOther;
+      if (a.cw !== b.cw) return b.cw - a.cw;
+      if (a.other !== b.other) return b.other - a.other;
     }
-
-    const aName = getLang() === 'pl' ? a.namePolish : a.nameEnglish;
-    const bName = getLang() === 'pl' ? b.namePolish : b.nameEnglish;
-    return aName.localeCompare(bName, getLang());
+    return a.name.localeCompare(b.name, lang);
   });
+
+  return decorated.map(d => d.c);
 }
 
 function buildCountryRow(country) {
@@ -387,9 +385,7 @@ function buildCountryRow(country) {
   row.appendChild(nameEl);
   row.appendChild(countEl);
 
-  const cw  = country.articles.flatMap(a => a.awards).filter(a => a.type === 'cw').length;
-  const da  = country.articles.flatMap(a => a.awards).filter(a => a.type === 'da').length;
-  const anm = country.articles.flatMap(a => a.awards).filter(a => a.type === 'anm').length;
+  const { cw, da, anm } = countAwardTypes(country.articles);
 
   if (cw || da || anm) {
     const badges = document.createElement('span');
@@ -412,14 +408,4 @@ function makeBadge(type, text) {
   b.className = `badge-${type}`;
   b.textContent = text;
   return b;
-}
-
-// ── Utility ───────────────────────────────────────────────────────────────────
-
-function formatDate(dateStr) {
-  // dateStr: 'YYYY-MM-DD' → display as 'YYYY-MM-DD' (locale-agnostic, short)
-  if (!dateStr) return '';
-  const [y, m, d] = dateStr.split('-');
-  if (!y) return dateStr;
-  return `${y}-${m}-${d}`;
 }

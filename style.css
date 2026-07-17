@@ -330,12 +330,9 @@ button {
   width: 120px;
   height: 10px;
   border-radius: 3px;
+  /* Placeholder until JS sets the mode/theme-aware gradient (map.js updateLegend) */
   background: linear-gradient(to right, var(--map-no-data), #084594);
   border: 1px solid var(--border);
-}
-
-html.dark #legend-gradient {
-  background: linear-gradient(to right, var(--map-no-data), #4ea8ff);
 }
 
 /* ── Replay control + overlay ── */

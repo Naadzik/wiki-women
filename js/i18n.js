@@ -28,9 +28,13 @@ const TRANSLATIONS = {
     'replay.pause':        'Pause',
     'replay.speed':        'Animation speed',
     'replay.day':          'day',
-    'replay.articles':     'articles',
-    'replay.awarded':      'awarded',
-    'replay.countries':    'countries',
+
+    'count.article.one':   'article',
+    'count.article.other': 'articles',
+    'count.country.one':   'country',
+    'count.country.other': 'countries',
+    'count.awarded.one':   'awarded',
+    'count.awarded.other': 'awarded',
 
     'filters.firstWomen':  'First woman in role',
 
@@ -41,8 +45,6 @@ const TRANSLATIONS = {
     'panel.draft':             'draft',
     'panel.firstWoman':        'First woman in this role in her country',
     'panel.unrecognizedTitle': 'Disputed territories',
-    'panel.article':           'article',
-    'panel.articles':          'articles',
 
     'search.placeholder':  'Search articles…',
 
@@ -117,9 +119,16 @@ const TRANSLATIONS = {
     'replay.pause':        'Pauza',
     'replay.speed':        'Prędkość animacji',
     'replay.day':          'dzień',
-    'replay.articles':     'artykułów',
-    'replay.awarded':      'wyróżnionych',
-    'replay.countries':    'państw',
+
+    'count.article.one':   'artykuł',
+    'count.article.few':   'artykuły',
+    'count.article.many':  'artykułów',
+    'count.country.one':   'państwo',
+    'count.country.few':   'państwa',
+    'count.country.many':  'państw',
+    'count.awarded.one':   'wyróżniony',
+    'count.awarded.few':   'wyróżnione',
+    'count.awarded.many':  'wyróżnionych',
 
     'filters.firstWomen':  'Pierwsza kobieta na stanowisku',
 
@@ -130,8 +139,6 @@ const TRANSLATIONS = {
     'panel.draft':             'szkic',
     'panel.firstWoman':        'Pierwsza kobieta na tym stanowisku w swoim kraju',
     'panel.unrecognizedTitle': 'Sporne terytoria',
-    'panel.article':           'artykuł',
-    'panel.articles':          'artykuły/artykułów',
 
     'search.placeholder':  'Szukaj artykułów…',
 
@@ -182,9 +189,11 @@ const TRANSLATIONS = {
 };
 
 let _lang = 'en';
+let _pluralRules = new Intl.PluralRules('en');
 
 export function init(lang) {
   _lang = lang in TRANSLATIONS ? lang : 'en';
+  _pluralRules = new Intl.PluralRules(_lang);
 }
 
 export function getLang() {
@@ -194,6 +203,21 @@ export function getLang() {
 /** Translate a key, falling back to English, then to the key itself. */
 export function t(key) {
   return TRANSLATIONS[_lang]?.[key] ?? TRANSLATIONS.en[key] ?? key;
+}
+
+/**
+ * Translate a count label with proper plural rules, e.g.
+ * tPlural('count.article', 5) → 'artykułów' in Polish, 'articles' in English.
+ * Looks up `<base>.<category>` (one/few/many/other) with sensible fallbacks.
+ */
+export function tPlural(base, n) {
+  const cat = _pluralRules.select(n);
+  return TRANSLATIONS[_lang]?.[`${base}.${cat}`]
+      ?? TRANSLATIONS[_lang]?.[`${base}.many`]
+      ?? TRANSLATIONS[_lang]?.[`${base}.other`]
+      ?? TRANSLATIONS.en[`${base}.${cat}`]
+      ?? TRANSLATIONS.en[`${base}.other`]
+      ?? base;
 }
 
 /** Re-render all static [data-i18n] elements in the document. */
