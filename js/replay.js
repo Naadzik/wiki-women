@@ -1,15 +1,16 @@
 // replay.js — "Replay the year" animation.
 // Sweeps the existing as-of-date filter one calendar day at a time, so the
 // audience watches the world map fill in day by day, with a live
-// day/article/country counter. Reuses applyFilters()'s asOfDate machinery.
-import { state, onReplayFrame, onFilterChange } from './app.js?v=17';
-import { t, tPlural } from './i18n.js?v=17';
-import { PROJECT_START, setText } from './utils.js?v=17';
+// day/article/country counter and a draggable scrubber. Reuses
+// applyFilters()'s asOfDate machinery — no new filtering logic.
+import { state, onReplayFrame, onFilterChange } from './app.js?v=18';
+import { t, tPlural } from './i18n.js?v=18';
+import { PROJECT_START, setText } from './utils.js?v=18';
 
 const DAY_MS       = 86_400_000;
 const TARGET_MS    = 20_000;    // ~20s for the whole year at 1× speed
 const MIN_FRAME_MS = 16;        // cap frame rate at ~60fps
-const HOLD_MS      = 1800;      // keep the final overlay up briefly before hiding
+const HOLD_MS      = 1800;      // keep the overlay up briefly after finishing
 
 let _data       = null;
 let _frameDates = [];   // one entry per calendar day, 'YYYY-MM-DD'
@@ -20,6 +21,11 @@ let _endTimer   = null; // pending end-of-animation cleanup (cancelled on restar
 let _idx        = 0;
 let _playing    = false;
 let _speed      = 1;    // playback multiplier: 0.5 = 2× slower, 2 = 2× faster
+
+// Drag scrubbing: rAF-throttled so fast mouse/touch movement doesn't queue up
+// more map redraws than a frame can show.
+let _seekRaf    = null;
+let _pendingIdx = null;
 
 export function init(data) {
   _data = data;
@@ -32,10 +38,26 @@ export function init(data) {
   _frameDates = buildDailyFrames(_minDate, last);
   // Pace the whole year to ~TARGET_MS, but never faster than MIN_FRAME_MS/day.
   _frameMs = Math.max(MIN_FRAME_MS, Math.round(TARGET_MS / _frameDates.length));
+
   document.getElementById('btn-replay')?.addEventListener('click', toggle);
+  document.getElementById('replay-close')?.addEventListener('click', close);
   document.querySelectorAll('#replay-speed .speed-btn').forEach(btn => {
     btn.addEventListener('click', () => setSpeed(parseFloat(btn.dataset.speed)));
   });
+
+  const slider = document.getElementById('replay-slider');
+  if (slider) {
+    slider.min = 0;
+    slider.max = _frameDates.length - 1;
+    slider.value = 0;
+    // Grabbing the thumb pauses auto-advance immediately, before any drag
+    // delta, so playback and the drag never fight over the current day.
+    slider.addEventListener('pointerdown', () => { if (_playing) pause(); });
+    slider.addEventListener('input', onSliderInput);
+    slider.addEventListener('change', onSliderChange);
+  }
+  setText('replay-scrub-start', _minDate);
+  setText('replay-scrub-end', last);
 }
 
 /** Change playback speed; takes effect immediately, even mid-animation. */
@@ -72,6 +94,15 @@ function buildDailyFrames(min, max) {
   return frames;
 }
 
+function clampIdx(i) {
+  return Math.min(Math.max(i, 0), _frameDates.length - 1);
+}
+
+function syncSlider(idx) {
+  const slider = document.getElementById('replay-slider');
+  if (slider) slider.value = idx;   // programmatic — does not fire input/change
+}
+
 // ── Playback ──────────────────────────────────────────────────────────────────
 
 export function toggle() {
@@ -86,28 +117,42 @@ function play() {
   _endTimer = null;
   _playing = true;
   setButton(true);
-  // Hide the continent bar while playing so the countdown banner takes its slot
-  // instead of adding height and pushing the map off-screen.
+  // Hide the continent bar while active so the countdown banner takes its
+  // slot instead of adding height and pushing the map off-screen.
   document.body.classList.add('replaying');
   if (_idx >= _frameDates.length) _idx = 0;   // restart when finished
   document.getElementById('replay-overlay')?.removeAttribute('hidden');
+  syncSlider(_idx);
   step();                                      // render the first frame immediately
   _timer = setInterval(step, _frameMs / _speed);
 }
 
+/** Stop auto-advance but keep the overlay + scrubber visible at the current day. */
 function pause() {
   clearInterval(_timer);
   _timer = null;
   _playing = false;
   setButton(false);
-  // Return to the normal layout at the paused day: hide the banner and bring the
-  // continent bar back. The header stats + date input already show the state.
-  document.getElementById('replay-overlay')?.setAttribute('hidden', '');
-  document.body.classList.remove('replaying');
-  // Settle the full UI (panel list, filter counts, date input) to the paused day,
-  // since per-frame updates only touched the map + stats for smoothness.
+  // Settle the full UI (panel list, filter counts, date input) to the paused
+  // day, since per-frame updates only touched the map + stats for smoothness.
   syncDateInput(state.activeFilters.asOfDate);
   onFilterChange();
+}
+
+/** Fully exit replay mode: stop, show the complete dataset, restore the layout. */
+function close() {
+  clearInterval(_timer);
+  _timer = null;
+  clearTimeout(_endTimer);
+  _endTimer = null;
+  _playing = false;
+  _idx = 0;   // next "play" starts fresh from day 1
+  setButton(false);
+  state.activeFilters.asOfDate = null;
+  syncDateInput(null);
+  onFilterChange();
+  document.getElementById('replay-overlay')?.setAttribute('hidden', '');
+  document.body.classList.remove('replaying');
 }
 
 function step() {
@@ -116,6 +161,7 @@ function step() {
   state.activeFilters.asOfDate = date;
   onReplayFrame();          // lightweight: map + stats only, so day-by-day stays smooth
   updateOverlay(date);
+  syncSlider(_idx);
   _idx++;
 }
 
@@ -129,12 +175,45 @@ function finish() {
   syncDateInput(null);
   onFilterChange();
   // Keep the continent bar hidden until the banner fades, so the two swap
-  // together and the map never gets pushed during the final hold.
+  // together and the map never gets pushed during the final hold. The
+  // scrubber (still at its max position) stays draggable during the hold.
   _endTimer = setTimeout(() => {
     document.getElementById('replay-overlay')?.setAttribute('hidden', '');
     document.body.classList.remove('replaying');
     _endTimer = null;
   }, HOLD_MS);
+}
+
+// ── Scrubber drag handling ──────────────────────────────────────────────────────
+
+/** Jump directly to a day. `settle=false` is a cheap live-preview during drag. */
+function seekTo(idx, settle) {
+  _idx = clampIdx(idx);
+  const date = _frameDates[_idx];
+  state.activeFilters.asOfDate = date;
+  updateOverlay(date);
+  if (settle) {
+    syncDateInput(date);
+    onFilterChange();
+  } else {
+    onReplayFrame();
+  }
+}
+
+function onSliderInput(e) {
+  if (_playing) pause();   // covers keyboard (arrow/Home/End) interaction too
+  _pendingIdx = parseInt(e.target.value, 10);
+  if (_seekRaf) return;
+  _seekRaf = requestAnimationFrame(() => {
+    _seekRaf = null;
+    if (_pendingIdx !== null) { seekTo(_pendingIdx, false); _pendingIdx = null; }
+  });
+}
+
+function onSliderChange(e) {
+  if (_seekRaf) { cancelAnimationFrame(_seekRaf); _seekRaf = null; }
+  seekTo(parseInt(e.target.value, 10), true);
+  _pendingIdx = null;
 }
 
 // ── Overlay + counters ────────────────────────────────────────────────────────
@@ -209,4 +288,3 @@ function syncDateInput(date) {
   if (clearBtn) clearBtn.style.display = date ? '' : 'none';
   document.getElementById('filter-group-date')?.classList.toggle('active', !!date);
 }
-

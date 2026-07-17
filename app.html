@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title data-i18n="header.title">Women in Politics — Wikipedia</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%97%BA%EF%B8%8F%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="style.css?v=17" />
+  <link rel="stylesheet" href="style.css?v=18" />
 
   <!-- D3 + TopoJSON (vendored locally so the app works offline / on flaky conference Wi-Fi) -->
-  <script src="vendor/d3.min.js?v=17"></script>
-  <script src="vendor/topojson-client.min.js?v=17"></script>
+  <script src="vendor/d3.min.js?v=18"></script>
+  <script src="vendor/topojson-client.min.js?v=18"></script>
 
   <!-- Chart.js + date adapter (vendored) -->
-  <script src="vendor/chart.umd.min.js?v=17"></script>
-  <script src="vendor/chartjs-adapter-date-fns.bundle.min.js?v=17"></script>
+  <script src="vendor/chart.umd.min.js?v=18"></script>
+  <script src="vendor/chartjs-adapter-date-fns.bundle.min.js?v=18"></script>
 </head>
 <body>
 
@@ -125,13 +125,22 @@
       </div>
     </div>
 
-    <!-- Replay overlay (shown while the year animation plays) -->
+    <!-- Replay overlay (shown while the year animation plays or is paused mid-way) -->
     <div id="replay-overlay" hidden>
-      <div id="replay-date">–</div>
-      <div id="replay-counters">
-        <span><b id="replay-day">0</b> <span data-i18n="replay.day">day</span></span>
-        <span><b id="replay-articles">0</b> <span id="replay-count-label">articles</span></span>
-        <span><b id="replay-countries">0</b> <span id="replay-countries-label">countries</span></span>
+      <button id="replay-close" data-i18n-title="replay.close" title="Close" aria-label="Close replay">✕</button>
+      <div id="replay-top">
+        <div id="replay-date">–</div>
+        <div id="replay-counters">
+          <span><b id="replay-day">0</b> <span data-i18n="replay.day">day</span></span>
+          <span><b id="replay-articles">0</b> <span id="replay-count-label">articles</span></span>
+          <span><b id="replay-countries">0</b> <span id="replay-countries-label">countries</span></span>
+        </div>
+      </div>
+      <div id="replay-scrubber">
+        <span id="replay-scrub-start" class="replay-scrub-label"></span>
+        <input type="range" id="replay-slider" min="0" max="0" value="0" step="1"
+               data-i18n-title="replay.scrub" title="Drag to a specific day" aria-label="Drag to a specific day">
+        <span id="replay-scrub-end" class="replay-scrub-label"></span>
       </div>
     </div>
 
@@ -276,7 +285,7 @@
 <div id="tooltip" role="tooltip" aria-hidden="true"></div>
 
 <!-- ════════════════════════════════════════════════════════════ SCRIPTS -->
-<script type="module" src="js/app.js?v=17"></script>
+<script type="module" src="js/app.js?v=18"></script>
 
 </body>
 </html>
