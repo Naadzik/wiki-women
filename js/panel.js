@@ -1,7 +1,7 @@
 // panel.js — country side panel
-import { findCountry, findCountryRaw, onCountryClick, onAwardDateClick } from './app.js?v=18';
-import { t, tPlural, getLang } from './i18n.js?v=18';
-import { countAwardTypes } from './utils.js?v=18';
+import { findCountry, findCountryRaw, onCountryClick, onAwardDateClick } from './app.js?v=19';
+import { t, tPlural, getLang } from './i18n.js?v=19';
+import { countAwardTypes } from './utils.js?v=19';
 
 const WIKI_BASE = 'https://pl.wikipedia.org/wiki/';
 

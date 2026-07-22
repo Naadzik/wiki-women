@@ -1,6 +1,6 @@
 // timeline.js — Chart.js cumulative timelines (CW awards + articles created)
-import { t } from './i18n.js?v=18';
-import { isDark, PROJECT_START } from './utils.js?v=18';
+import { t } from './i18n.js?v=19';
+import { isDark, PROJECT_START } from './utils.js?v=19';
 
 // ── Theme helpers ─────────────────────────────────────────────────────────────
 

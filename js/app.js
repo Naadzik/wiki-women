@@ -1,12 +1,12 @@
 // app.js — entry point, global state, pub/sub wiring
-import * as i18n   from './i18n.js?v=18';
-import * as stats  from './stats.js?v=18';
-import * as filters from './filters.js?v=18';
-import * as search  from './search.js?v=18';
-import * as map     from './map.js?v=18';
-import * as panel   from './panel.js?v=18';
-import * as timeline from './timeline.js?v=18';
-import * as replay   from './replay.js?v=18';
+import * as i18n   from './i18n.js?v=19';
+import * as stats  from './stats.js?v=19';
+import * as filters from './filters.js?v=19';
+import * as search  from './search.js?v=19';
+import * as map     from './map.js?v=19';
+import * as panel   from './panel.js?v=19';
+import * as timeline from './timeline.js?v=19';
+import * as replay   from './replay.js?v=19';
 
 // ── Continent definitions ─────────────────────────────────────────────────────
 
@@ -211,7 +211,7 @@ export function onFilterChange() {
 export function onReplayFrame() {
   if (!_data) return;
   const filtered = applyFilters(_data);
-  map.update(filtered);
+  map.updateInstant(filtered);   // no transition — see map.js for why
   stats.update(filtered, _data.meta);
 }
 
