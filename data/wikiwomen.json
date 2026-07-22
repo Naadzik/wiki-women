@@ -1,8 +1,8 @@
 {
   "meta": {
-    "generatedAt": "2026-07-22T12:38:26.000Z",
-    "totalArticles": 516,
-    "totalPublished": 513,
+    "generatedAt": "2026-07-22T00:00:00.000Z",
+    "totalArticles": 517,
+    "totalPublished": 514,
     "totalCountries": 206,
     "unMembersCovered": 193,
     "totalCw": 235,
@@ -2086,6 +2086,15 @@
           "editorialActions": [],
           "isFirstWoman": false,
           "created": "2026-07-21"
+        },
+        {
+          "title": "Nadège Abomangoli",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": false,
+          "created": "2026-07-22"
         }
       ]
     },
@@ -11144,6 +11153,10 @@
     {
       "date": "2026-07-21",
       "cumulative": 516
+    },
+    {
+      "date": "2026-07-22",
+      "cumulative": 517
     }
   ]
 }
