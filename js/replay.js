@@ -3,9 +3,9 @@
 // audience watches the world map fill in day by day, with a live
 // day/article/country counter and a draggable scrubber. Reuses
 // applyFilters()'s asOfDate machinery — no new filtering logic.
-import { state, onReplayFrame, onFilterChange } from './app.js?v=18';
-import { t, tPlural } from './i18n.js?v=18';
-import { PROJECT_START, setText } from './utils.js?v=18';
+import { state, onReplayFrame, onFilterChange } from './app.js?v=19';
+import { t, tPlural } from './i18n.js?v=19';
+import { PROJECT_START, setText } from './utils.js?v=19';
 
 const DAY_MS       = 86_400_000;
 const TARGET_MS    = 20_000;    // ~20s for the whole year at 1× speed

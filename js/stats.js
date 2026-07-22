@@ -1,5 +1,5 @@
 // stats.js — stats bar numbers
-import { uniqueByTitle, countAwardTypes, countFirstWomen, setText } from './utils.js?v=18';
+import { uniqueByTitle, countAwardTypes, countFirstWomen, setText } from './utils.js?v=19';
 
 export function init() {
   // Nothing to set up — DOM elements already exist in HTML

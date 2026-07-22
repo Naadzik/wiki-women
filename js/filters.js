@@ -1,7 +1,7 @@
 // filters.js — editorial-action filter buttons + clear all
-import { state, onFilterChange } from './app.js?v=18';
-import { t } from './i18n.js?v=18';
-import { uniqueByTitle, countFirstWomen } from './utils.js?v=18';
+import { state, onFilterChange } from './app.js?v=19';
+import { t } from './i18n.js?v=19';
+import { uniqueByTitle, countFirstWomen } from './utils.js?v=19';
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let _rawData = null;

@@ -1,10 +1,10 @@
 // map.js — D3 choropleth world map
-import { state, onCountryClick, buildCountryMap } from './app.js?v=18';
-import { t, getLang } from './i18n.js?v=18';
-import { isDark, countAwardTypes } from './utils.js?v=18';
+import { state, onCountryClick, buildCountryMap } from './app.js?v=19';
+import { t, getLang } from './i18n.js?v=19';
+import { isDark, countAwardTypes } from './utils.js?v=19';
 
 // Vendored locally (was cdn.jsdelivr.net/npm/world-atlas@2) so the map loads offline.
-const WORLD_ATLAS_URL = 'data/countries-110m.json?v=18';
+const WORLD_ATLAS_URL = 'data/countries-110m.json?v=19';
 
 // ── ISO numeric → alpha-3 lookup ─────────────────────────────────────────────
 // Source: ISO 3166-1 (entries covering the dataset), sorted by numeric code.
@@ -299,11 +299,16 @@ export async function init(filteredData, rawData) {
 
 // ── Update (on filter change) ─────────────────────────────────────────────────
 
-export function update(filteredData) {
+function recomputeData(filteredData) {
   _countryDataMap = buildCountryMap([...filteredData.countries, ...filteredData.unrecognized]);
   computeMaxima(filteredData);
   rebuildScales();
   updateLegend();
+}
+
+/** Normal update path: infrequent, one-off filter changes get a smooth crossfade. */
+export function update(filteredData) {
+  recomputeData(filteredData);
 
   _svg?.select('#map-countries').selectAll('path.country-path')
     .transition().duration(350)
@@ -311,6 +316,25 @@ export function update(filteredData) {
 
   _svg?.select('#map-dots').selectAll('circle.micro-dot')
     .transition().duration(350)
+    .attr('fill', d => colorForKey(d.key));
+}
+
+/**
+ * Replay-frame update path: paints instantly, no transition. The day-by-day
+ * replay calls this every ~20-40ms — starting a new 350ms transition that
+ * often, so each one gets interrupted almost immediately by the next and the
+ * fill visibly lags behind the true colour until playback stops. The frame
+ * stepping itself already reads as motion, so no transition is needed here.
+ */
+export function updateInstant(filteredData) {
+  recomputeData(filteredData);
+
+  _svg?.select('#map-countries').selectAll('path.country-path')
+    .interrupt()
+    .attr('fill', d => colorForFeature(d));
+
+  _svg?.select('#map-dots').selectAll('circle.micro-dot')
+    .interrupt()
     .attr('fill', d => colorForKey(d.key));
 }
 
