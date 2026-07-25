@@ -1,8 +1,8 @@
 {
   "meta": {
-    "generatedAt": "2026-07-22T00:00:00.000Z",
-    "totalArticles": 517,
-    "totalPublished": 514,
+    "generatedAt": "2026-07-24T00:00:00.000Z",
+    "totalArticles": 519,
+    "totalPublished": 516,
     "totalCountries": 206,
     "unMembersCovered": 193,
     "totalCw": 235,
@@ -4514,6 +4514,24 @@
           "editorialActions": [],
           "isFirstWoman": true,
           "created": "2026-02-01"
+        },
+        {
+          "title": "Cornell Babendererde",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": false,
+          "created": "2026-07-23"
+        },
+        {
+          "title": "Katharina Beck",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": false,
+          "created": "2026-07-24"
         }
       ]
     },
@@ -11157,6 +11175,14 @@
     {
       "date": "2026-07-22",
       "cumulative": 517
+    },
+    {
+      "date": "2026-07-23",
+      "cumulative": 518
+    },
+    {
+      "date": "2026-07-24",
+      "cumulative": 519
     }
   ]
 }
