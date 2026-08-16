@@ -1,8 +1,8 @@
 {
   "meta": {
-    "generatedAt": "2026-07-24T00:00:00.000Z",
-    "totalArticles": 519,
-    "totalPublished": 516,
+    "generatedAt": "2026-08-15T00:00:00.000Z",
+    "totalArticles": 541,
+    "totalPublished": 538,
     "totalCountries": 206,
     "unMembersCovered": 193,
     "totalCw": 235,
@@ -503,6 +503,15 @@
           "editorialActions": [],
           "isFirstWoman": true,
           "created": "2026-07-04"
+        },
+        {
+          "title": "Grete Rehor",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": true,
+          "created": "2026-08-07"
         }
       ]
     },
@@ -702,6 +711,15 @@
           "editorialActions": [],
           "isFirstWoman": true,
           "created": "2026-02-28"
+        },
+        {
+          "title": "Mathilde Schroyens",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": true,
+          "created": "2026-08-04"
         }
       ]
     },
@@ -1291,6 +1309,15 @@
           ],
           "isFirstWoman": false,
           "created": "2026-05-14"
+        },
+        {
+          "title": "Anka Berus",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": true,
+          "created": "2026-08-11"
         }
       ]
     },
@@ -1324,6 +1351,15 @@
           "editorialActions": [],
           "isFirstWoman": true,
           "created": "2025-11-06"
+        },
+        {
+          "title": "Stella Soulioti",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": true,
+          "created": "2026-08-13"
         }
       ]
     },
@@ -2264,6 +2300,15 @@
           ],
           "isFirstWoman": true,
           "created": "2026-05-31"
+        },
+        {
+          "title": "Lina Mendoni",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": false,
+          "created": "2026-08-03"
         }
       ]
     },
@@ -2567,6 +2612,15 @@
           ],
           "isFirstWoman": true,
           "created": "2026-03-29"
+        },
+        {
+          "title": "Marta González Vázquez",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": false,
+          "created": "2026-08-12"
         }
       ]
     },
@@ -2621,6 +2675,51 @@
           "editorialActions": [],
           "isFirstWoman": true,
           "created": "2026-01-30"
+        },
+        {
+          "title": "Wieke Paulusma",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": false,
+          "created": "2026-07-30"
+        },
+        {
+          "title": "Ingrid Michon",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": false,
+          "created": "2026-07-31"
+        },
+        {
+          "title": "Marjolein Moorman",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": false,
+          "created": "2026-08-01"
+        },
+        {
+          "title": "Haya van Someren",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": true,
+          "created": "2026-08-05"
+        },
+        {
+          "title": "Ria Beckers",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": true,
+          "created": "2026-08-06"
         }
       ]
     },
@@ -2847,6 +2946,15 @@
           "editorialActions": [],
           "isFirstWoman": true,
           "created": "2026-01-22"
+        },
+        {
+          "title": "Tras Honan",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": true,
+          "created": "2026-08-02"
         }
       ]
     },
@@ -3766,6 +3874,24 @@
           "editorialActions": [],
           "isFirstWoman": true,
           "created": "2026-04-17"
+        },
+        {
+          "title": "Diane Adehm",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": false,
+          "created": "2026-08-14"
+        },
+        {
+          "title": "Françoise Kemp",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": false,
+          "created": "2026-08-15"
         }
       ]
     },
@@ -4532,6 +4658,51 @@
           "editorialActions": [],
           "isFirstWoman": false,
           "created": "2026-07-24"
+        },
+        {
+          "title": "Melanie Bernstein",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": false,
+          "created": "2026-07-25"
+        },
+        {
+          "title": "Simone Borchardt",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": false,
+          "created": "2026-07-26"
+        },
+        {
+          "title": "Wiebke Esdar",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": false,
+          "created": "2026-07-27"
+        },
+        {
+          "title": "Simone Fischer",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": false,
+          "created": "2026-07-28"
+        },
+        {
+          "title": "Kerstin Griese",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": false,
+          "created": "2026-07-29"
         }
       ]
     },
@@ -5165,6 +5336,15 @@
           "editorialActions": [],
           "isFirstWoman": true,
           "created": "2026-01-16"
+        },
+        {
+          "title": "Maria Teresa Cárcomo Lobo",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": true,
+          "created": "2026-08-10"
         }
       ]
     },
@@ -5851,6 +6031,15 @@
           "editorialActions": [],
           "isFirstWoman": true,
           "created": "2026-07-05"
+        },
+        {
+          "title": "Helena Woleková",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": true,
+          "created": "2026-08-08"
         }
       ]
     },
@@ -5886,6 +6075,15 @@
           ],
           "isFirstWoman": false,
           "created": "2026-05-20"
+        },
+        {
+          "title": "Katja Boh",
+          "isDraft": false,
+          "draftPath": null,
+          "awards": [],
+          "editorialActions": [],
+          "isFirstWoman": true,
+          "created": "2026-08-09"
         }
       ]
     },
@@ -11183,6 +11381,94 @@
     {
       "date": "2026-07-24",
       "cumulative": 519
+    },
+    {
+      "date": "2026-07-25",
+      "cumulative": 520
+    },
+    {
+      "date": "2026-07-26",
+      "cumulative": 521
+    },
+    {
+      "date": "2026-07-27",
+      "cumulative": 522
+    },
+    {
+      "date": "2026-07-28",
+      "cumulative": 523
+    },
+    {
+      "date": "2026-07-29",
+      "cumulative": 524
+    },
+    {
+      "date": "2026-07-30",
+      "cumulative": 525
+    },
+    {
+      "date": "2026-07-31",
+      "cumulative": 526
+    },
+    {
+      "date": "2026-08-01",
+      "cumulative": 527
+    },
+    {
+      "date": "2026-08-02",
+      "cumulative": 528
+    },
+    {
+      "date": "2026-08-03",
+      "cumulative": 529
+    },
+    {
+      "date": "2026-08-04",
+      "cumulative": 530
+    },
+    {
+      "date": "2026-08-05",
+      "cumulative": 531
+    },
+    {
+      "date": "2026-08-06",
+      "cumulative": 532
+    },
+    {
+      "date": "2026-08-07",
+      "cumulative": 533
+    },
+    {
+      "date": "2026-08-08",
+      "cumulative": 534
+    },
+    {
+      "date": "2026-08-09",
+      "cumulative": 535
+    },
+    {
+      "date": "2026-08-10",
+      "cumulative": 536
+    },
+    {
+      "date": "2026-08-11",
+      "cumulative": 537
+    },
+    {
+      "date": "2026-08-12",
+      "cumulative": 538
+    },
+    {
+      "date": "2026-08-13",
+      "cumulative": 539
+    },
+    {
+      "date": "2026-08-14",
+      "cumulative": 540
+    },
+    {
+      "date": "2026-08-15",
+      "cumulative": 541
     }
   ]
 }
